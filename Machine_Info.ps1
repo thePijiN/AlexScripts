@@ -1,4 +1,4 @@
-﻿# MACHINE_INFO.ps1 - by Alex DeMey - Displays information about the current Windows configuration
+# MACHINE_INFO.ps1 - by Alex DeMey - Displays information about the current Windows configuration
 
 # Copyright (c) 2025 Alexander DeMey
 # All rights reserved.
