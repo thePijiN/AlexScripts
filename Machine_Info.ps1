@@ -2,7 +2,6 @@
 
 # Copyright (c) 2025 Alexander DeMey
 # All rights reserved.
-#
 # This script is provided under a personal, non-transferable license.
 # The author reserves the right to revoke, restrict, or deny usage, reproduction, or distribution
 # of this script at any time, without prior notice, to any individual or organization.
@@ -33,7 +32,7 @@ if (-not (Test-Admin)) {
     }
 }
 
-#CURRENT USER INFO
+# CURRENT USER INFO
 function CheckUserAdmin { # Checks a username  for admin, returns boolean. Feed it Username: 'CurrentUser' to check $env:USERNAME
     param(
         [string]$Username = 'CurrentUser'
@@ -52,7 +51,7 @@ function CheckUserAdmin { # Checks a username  for admin, returns boolean. Feed 
     }
     return $false
 }
-function ListAllUsersWithAdminStatus {
+function ListAllUsersWithAdminStatus { # Lists Local and Domain/Azure accounts, as well as info on each. 
     $adminGroupMembers = Get-LocalGroupMember -Group "Administrators" -ErrorAction SilentlyContinue
     $currentUserFull = [System.Security.Principal.WindowsIdentity]::GetCurrent().Name
     $currentUserShort = $currentUserFull.Split('\')[-1]
@@ -182,7 +181,7 @@ function GetNetworkType { # $global:NetworkType
         Write-Host "No Internet" -ForegroundColor Red -NoNewline
     }
 }
-function GetDomainStatus {
+function GetDomainStatus { # Writes Domain Join Status ($global:DomainStatus), and Domain Name. 
     $global:DomainStatus = ""
     $dsregOutput = dsregcmd /status
 
@@ -221,7 +220,7 @@ function GetDomainStatus {
     }
 }
 
-function GetHardwareMAC { # $global:HardwareMAC
+function GetHardwareMAC { # Writes Hardware MAC Address ($global:HardwareMAC)
     $MAC = Get-NetAdapter | Where-Object { $_.Status -eq 'Up' -and !$_.Virtual } | Select-Object -ExpandProperty MacAddress
     if ($MAC) {
         $global:HardwareMAC = $MAC
@@ -368,4 +367,4 @@ ShowSystemSummary
 
 #CHANGELOG
 # 0.0.0 - 5/3/25 - Created.
-# 0.0.1 - 5/4/25 - Added TestAdmin and if statement to beginning to prompt user to re-run as admin, if not already done. 
+# 0.0.1 - 5/4/25 - Added TestAdmin and if statement to beginning to prompt user to re-run as admin, if not already done. Revised GetIPv4Address function to grab IPv4 specifically for the first adapter w Internet access. 
