@@ -1,0 +1,371 @@
+﻿# MACHINE_INFO.ps1 - by Alex DeMey - Displays information about the current Windows configuration
+
+# Copyright (c) 2025 Alexander DeMey
+# All rights reserved.
+#
+# This script is provided under a personal, non-transferable license.
+# The author reserves the right to revoke, restrict, or deny usage, reproduction, or distribution
+# of this script at any time, without prior notice, to any individual or organization.
+# Licensed for use solely within the scope of current professional engagement.
+# Any use, reproduction, or distribution outside of that scope shall require prior, written authorization from the author.
+
+function Test-Admin {
+    return ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole] "Administrator")
+}
+
+# Check if running as admin, if not prompt for Y/N to attempt re-launch as admin
+if (-not (Test-Admin)) {
+    Write-Host "This script requires administrative privileges to function correctly." -ForegroundColor Yellow
+    $response = Read-Host "Would you like to relaunch this script as Admin in Windows Terminal? (Y/N)"
+    
+    if ($response -eq 'Y') {
+        # Relaunch script in Windows Terminal as admin
+        $wtPath = "wt.exe"
+
+        # We need to escape the script path correctly
+        $scriptPath = "`"$PSCommandPath`""
+
+        # Start Windows Terminal with admin privileges, running PowerShell script in the default profile
+        Start-Process $wtPath -ArgumentList "powershell.exe -NoExit -File $scriptPath" -Verb RunAs
+        exit  # Exit current session after relaunching
+    } elseif ($response -eq 'N') {
+        Write-Host "Proceeding without admin rights..." -ForegroundColor Yellow
+    }
+}
+
+#CURRENT USER INFO
+function CheckUserAdmin { # Checks a username  for admin, returns boolean. Feed it Username: 'CurrentUser' to check $env:USERNAME
+    param(
+        [string]$Username = 'CurrentUser'
+    )
+
+    if ($Username -eq 'CurrentUser') {
+        $Username = $env:USERNAME
+    }
+
+    $adminGroupMembers = (Get-LocalGroupMember -Group 'Administrators').Name
+
+    foreach ($member in $adminGroupMembers) {
+        if ($member -match "$Username$") {
+            return $true
+        }
+    }
+    return $false
+}
+function ListAllUsersWithAdminStatus {
+    $adminGroupMembers = Get-LocalGroupMember -Group "Administrators" -ErrorAction SilentlyContinue
+    $currentUserFull = [System.Security.Principal.WindowsIdentity]::GetCurrent().Name
+    $currentUserShort = $currentUserFull.Split('\')[-1]
+
+    $localUsers = Get-LocalUser
+    $defaultAccounts = @('DefaultAccount', 'Guest', 'WDAGUtilityAccount', 'Administrator', 'WsiAccount') # Default users to omit, unless they are enabled.
+
+    # Build set of local usernames (short names)
+    $localUsernames = $localUsers.Name
+
+    Write-Host "~~~" -NoNewline
+    Write-Host "Local Users" -ForegroundColor Green -BackgroundColor DarkGray -NoNewline
+    Write-Host "~~~"
+
+    foreach ($user in $localUsers) {
+        $username = $user.Name
+        $isEnabled = $user.Enabled
+        $isCurrent = $username -eq $currentUserShort
+        $isAdmin = $false
+
+        foreach ($admin in $adminGroupMembers) {
+            $adminNameShort = $admin.Name.Split('\')[-1]
+            if ($adminNameShort -eq $username) {
+                $isAdmin = $true
+                break
+            }
+        }
+
+        if (-not $isEnabled -and ($defaultAccounts -contains $username)) {
+            continue
+        }
+
+        if ($isCurrent) {
+            Write-Host "* " -NoNewline -ForegroundColor Cyan
+        } else {
+            Write-Host "- " -NoNewline -ForegroundColor Gray
+        }
+
+        Write-Host "$username " -NoNewline -ForegroundColor White
+
+        if ($isAdmin) {
+            Write-Host "(Admin) " -NoNewline -ForegroundColor Green
+        } else {
+            Write-Host "(Not Admin) " -NoNewline -ForegroundColor Red
+        }
+
+        if ($isEnabled) {
+            Write-Host "(ENABLED) " -NoNewline -ForegroundColor Green
+        } else {
+            Write-Host "(DISABLED) " -NoNewline -ForegroundColor Red
+        }
+
+        if ($defaultAccounts -contains $username) {
+            Write-Host "(Default Account)" -ForegroundColor DarkGray
+        } else {
+            Write-Host ""
+        }
+    }
+
+    # Properly filter out only the non-local admin entries
+    $nonLocalAdmins = $adminGroupMembers | Where-Object {
+        $adminShortName = $_.Name.Split('\')[-1]
+        return -not ($localUsernames -contains $adminShortName)
+    }
+
+    if ($nonLocalAdmins.Count -gt 0) {
+        Write-Host "~~~" -NoNewline
+        Write-Host "Azure AD / Domain Accounts in Administrators Group" -ForegroundColor Cyan -BackgroundColor DarkGray -NoNewline
+        Write-Host "~~~"
+
+        foreach ($member in $nonLocalAdmins) {
+            $isCurrent = ($member.Name -eq $currentUserFull)
+
+            if ($isCurrent) {
+                Write-Host "* " -NoNewline -ForegroundColor Cyan
+            } else {
+                Write-Host "- " -NoNewline -ForegroundColor Gray
+            }
+
+            Write-Host "$($member.Name) " -NoNewline -ForegroundColor White
+            Write-Host "(Admin) (AAD/Domain Account)" -ForegroundColor Green
+        }
+    }
+}
+
+# HARDWARE INFO
+function GetDeviceName { # $global:DeviceName
+    $global:DeviceName = $env:COMPUTERNAME
+    Write-Host "$($global:DeviceName)" -ForegroundColor Green -NoNewline
+}
+function GetSerialNumber { # $global:serialNumber
+    $global:serialNumber = "Not Found"
+
+    try {
+        $serial = (Get-WmiObject Win32_BIOS).SerialNumber
+        if ($serial) {
+            $global:serialNumber = $serial.Trim()
+        }
+    } catch {
+        $global:serialNumber = "Not Found"
+    }
+
+    if ($global:serialNumber -ne "Not Found") {
+        Write-Host "$($global:serialNumber)" -ForegroundColor Yellow -NoNewline
+    } else {
+        Write-Host "Not Found" -ForegroundColor Red -NoNewline
+    }
+}
+# NETWORK INFO
+function GetNetworkType { # $global:NetworkType
+    $global:NetworkType = "Unknown"
+    $adapter = Get-NetAdapter | Where-Object { $_.Status -eq "Up" -and !$_.Virtual } | Select-Object -First 1
+
+    if ($adapter) {
+        if ($adapter.Name -match "Wi-Fi|Wireless") {
+            $global:NetworkType = "WiFi"
+            Write-Host "WiFi" -ForegroundColor Cyan -NoNewline
+        } elseif ($adapter.Name -match "Ethernet") {
+            $global:NetworkType = "Ethernet"
+            Write-Host "Ethernet" -ForegroundColor Green -NoNewline
+        } else {
+            $global:NetworkType = $adapter.Name
+            Write-Host "$($adapter.Name)" -ForegroundColor Yellow -NoNewline
+        }
+    } else {
+        $global:NetworkType = "No Internet"
+        Write-Host "No Internet" -ForegroundColor Red -NoNewline
+    }
+}
+function GetDomainStatus {
+    $global:DomainStatus = ""
+    $dsregOutput = dsregcmd /status
+
+    # Extract the values for AzureAdJoined and DomainJoined
+    $azureAdJoined = ($dsregOutput | Select-String "AzureAdJoined\s*:\s*(\w+)" | ForEach-Object { $_.Matches[0].Groups[1].Value }) -eq 'YES'
+    $domainJoined  = ($dsregOutput | Select-String "DomainJoined\s*:\s*(\w+)"   | ForEach-Object { $_.Matches[0].Groups[1].Value }) -eq 'YES'
+
+    # Local domain name (if any)
+    $localDomain = (Get-WmiObject -Class Win32_ComputerSystem).Domain
+    $entraDomain = ""
+
+    # Only attempt to parse Entra domain if AzureAD joined
+    if ($azureAdJoined) {
+        $aadInfo = $dsregOutput | Select-String "TenantName"
+        if ($aadInfo) {
+            $entraDomain = ($aadInfo.ToString() -replace 'TenantName\s*:\s*', '').Trim()
+        }
+    }
+
+    # Determine the domain status
+    if ($azureAdJoined -and $domainJoined) {
+        $global:DomainStatus = "Hybrid"
+        Write-Host "Hybrid: $localDomain/$entraDomain" -ForegroundColor Yellow -NoNewline
+    }
+    elseif ($azureAdJoined) {
+        $global:DomainStatus = "Entra"
+        Write-Host "Entra: $entraDomain" -ForegroundColor Cyan -NoNewline
+    }
+    elseif ($domainJoined) {
+        $global:DomainStatus = "Local"
+        Write-Host "Local: $localDomain" -ForegroundColor Green -NoNewline
+    }
+    else {
+        $global:DomainStatus = "None"
+        Write-Host "None" -ForegroundColor Red -NoNewline
+    }
+}
+
+function GetHardwareMAC { # $global:HardwareMAC
+    $MAC = Get-NetAdapter | Where-Object { $_.Status -eq 'Up' -and !$_.Virtual } | Select-Object -ExpandProperty MacAddress
+    if ($MAC) {
+        $global:HardwareMAC = $MAC
+        Write-Host "$MAC" -ForegroundColor Green  -NoNewline
+    } else {
+        $global:HardwareMAC = "Not Found"
+        Write-Host "Not Found" -ForegroundColor Red  -NoNewline
+    }
+}
+function GetIPv4Address {
+    # Get the interface index for the default route (0.0.0.0/0)
+    $defaultRoute = Get-NetRoute -DestinationPrefix "0.0.0.0/0" |
+        Where-Object { $_.NextHop -ne "::" } |
+        Sort-Object -Property RouteMetric |
+        Select-Object -First 1
+
+    if ($null -eq $defaultRoute) {
+        Write-Host "No active internet-connected IPv4 adapter found" -ForegroundColor Red -NoNewline
+        return
+    }
+
+    $ifIndex = $defaultRoute.InterfaceIndex
+
+    # Get the corresponding IPv4 address
+    $ipAddress = Get-NetIPAddress -AddressFamily IPv4 -InterfaceIndex $ifIndex |
+        Where-Object { $_.IPAddress -notlike '169.254.*' } |  # Exclude APIPA
+        Select-Object -ExpandProperty IPAddress -First 1
+
+    if ($ipAddress) {
+        Write-Host "$ipAddress" -ForegroundColor Cyan -NoNewline
+    } else {
+        Write-Host "No valid IPv4 address found for active interface" -ForegroundColor Red -NoNewline
+    }
+}
+# SOFTWARE INFO
+function GetWindowsVersion { # $global:WindowsVersion
+    try {
+        $winRegPath = "HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion"
+        $props = Get-ItemProperty -Path $winRegPath
+
+        $productName = $props.ProductName
+        $releaseId = $props.ReleaseId
+        $displayVersion = $props.DisplayVersion
+        $currentBuild = $props.CurrentBuild
+        $ubr = $props.UBR  # Update Build Revision
+
+        # Construct OS Build (e.g., 22631.3447)
+        $osBuild = "$currentBuild.$ubr"
+
+        # Choose either DisplayVersion or ReleaseId for feature update info
+        $featureUpdate = if ($displayVersion) { $displayVersion } elseif ($releaseId) { $releaseId } else { "Unknown" }
+
+        $global:WindowsVersion = "$productName - $featureUpdate - Build $osBuild"
+
+        Write-Host $global:WindowsVersion -ForegroundColor Black -BackgroundColor Cyan -NoNewline
+		Write-Host "" -NoNewLine
+    } catch {
+        $global:WindowsVersion = "Not Found"
+        Write-Host "Not Found" -ForegroundColor Red -NoNewline
+    }
+}
+function GetLTAgentID { # $global:LTAgentID
+    $global:LTAgentID = "Not Found"
+
+    try {
+        $LTagentID = Get-ItemProperty -Path "HKLM:\SOFTWARE\LabTech\Service" -Name "ID" -ErrorAction Stop
+        if ($LTagentID.ID -ne $null) {
+            $global:LTAgentID = $LTagentID.ID
+            Write-Host "$($global:LTAgentID)" -ForegroundColor Green -NoNewline
+            return
+        }
+    } catch {
+        # Silent fail
+    }
+
+    Write-Host "Not Found" -ForegroundColor Red -NoNewline
+}
+function GetBitlockerRecovery { # Write-Hosts ID and Key for latest Bitlocker 
+    $bitlockerInfo = Get-BitLockerVolume -MountPoint "C:" -ErrorAction SilentlyContinue
+
+    if (-not $bitlockerInfo -or $bitlockerInfo.ProtectionStatus -ne 'On') {
+        Write-Host "Disabled" -ForegroundColor Red
+        return
+    }
+
+    $recoveryKeys = $bitlockerInfo.KeyProtector | Where-Object { $_.KeyProtectorType -eq 'RecoveryPassword' }
+
+    if ($recoveryKeys.Count -eq 0) {
+        Write-Host "Enabled - NoRecovery!" -ForegroundColor Red
+        return
+    }
+
+    # Use the last key, which is usually the valid one
+    $latestKey = $recoveryKeys[-1]
+
+    $bitlockerID = $latestKey.KeyProtectorId
+    $bitlockerRecoveryKey = $latestKey.RecoveryPassword
+
+    Write-Host "Identifier: " -NoNewLine
+    Write-Host "$bitlockerID" -ForegroundColor Yellow
+    Write-Host "Recovery Key: " -NoNewLine
+    Write-Host "$bitlockerRecoveryKey" -ForegroundColor Green
+
+    <# Optional: return as object
+    return [PSCustomObject]@{
+        Identifier    = $bitlockerID
+        RecoveryKey   = $bitlockerRecoveryKey
+        Status        = "Enabled"
+    }
+    #>
+}
+function GetCrowdstrikeInstallStatus {
+    $exists = Test-Path "C:\Program Files\CrowdStrike"
+    if ($exists) {
+        Write-Host "Detected" -ForegroundColor Green -NoNewline
+    } else {
+        Write-Host "Not Found" -ForegroundColor Red -NoNewline
+    }
+}
+function GetCloudRadialInstallStatus {
+    $exists = Test-Path "C:\Program Files (x86)\CloudRadial Agent\CloudRadial.Agent.exe"
+    if ($exists) {
+        Write-Host "Detected" -ForegroundColor Green -NoNewline
+    } else {
+        Write-Host "Not Found" -ForegroundColor Red -NoNewline
+    }
+}
+
+# DISPLAY INFO
+function ShowSystemSummary {
+   
+    Write-Host "==== System Info ====" -BackgroundColor Black
+    Write-Host "GENERAL" -BackgroundColor DarkGray -ForegroundColor Cyan -NoNewLine; Write-Host " Device Name: " -NoNewLine; GetDeviceName; Write-Host " | S/N: " -NoNewLine; GetSerialNumber; Write-Host " | OS: " -NoNewline; GetWindowsVersion; Write-Host "" -BackgroundColor Black
+    Write-Host "NETWORK" -BackgroundColor DarkGray -ForegroundColor Cyan -NoNewLine;  Write-Host " MAC Address: " -NoNewline; GetHardwareMAC; Write-Host " | IPv4 Address: " -NoNewline; GetIPv4Address; Write-Host " | Domain Type: " -NoNewLine; GetDomainStatus;  Write-Host " | Connection Type: " -NoNewLine; GetNetworkType; Write-Host ""
+	Write-Host "SOFTWARE" -BackgroundColor DarkGray -ForegroundColor Cyan -NoNewLine; Write-Host " LTAgent ID: " -NoNewLine; GetLTAgentID; Write-Host " | Crowdstrike: " -NoNewLine; GetCrowdstrikeInstallStatus; Write-Host " | CloudRadial: " -NoNewLine; GetCloudRadialInstallStatus; Write-Host ""
+    Write-Host "==== Bitlocker ====" -BackgroundColor Black
+	GetBitlockerRecovery
+	Write-Host "==== Users ====" -BackgroundColor Black
+	ListAllUsersWithAdminStatus
+	Write-Host "(`"" -NoNewLine; Write-Host "*" -ForegroundColor Cyan -NoNewline; Write-host "`" = `"You`")"
+	Write-Host ""; Read-host "Enter to exit..."
+}
+ShowSystemSummary
+
+#CHANGELOG
+# 0.0.0 - 5/3/25 - Created.
+# 0.0.1 - 5/4/25 - Added TestAdmin and if statement to beginning to prompt user to re-run as admin, if not already done. 
