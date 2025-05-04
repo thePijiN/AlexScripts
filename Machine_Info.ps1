@@ -370,6 +370,35 @@ function GetCloudRadialInstallStatus {
 }
 
 # DISPLAY INFO
+function ShowExitSpinner {
+    $spinnerChars = @('|', '/', '-', '\')
+    $spinnerIndex = 0
+    $promptBase = "Press any key to exit"
+    $startLeft = [Console]::CursorLeft
+    $startTop = [Console]::CursorTop
+
+    [Console]::CursorVisible = $false
+    try {
+        while (-not [Console]::KeyAvailable) {
+            $spinnerChar = $spinnerChars[$spinnerIndex]
+            $fullText = "$spinnerChar $promptBase $spinnerChar"
+
+            [Console]::SetCursorPosition($startLeft, $startTop)
+            Write-Host $fullText -NoNewline
+
+            Start-Sleep -Milliseconds 150
+            $spinnerIndex = ($spinnerIndex + 1) % $spinnerChars.Length
+        }
+
+        # Clear spinner line after key press
+        [Console]::SetCursorPosition($startLeft, $startTop)
+        Write-Host (' ' * ($promptBase.Length + 4)) -NoNewline  # +4 for spinner chars + spaces
+        [Console]::SetCursorPosition($startLeft, $startTop)
+        [Console]::ReadKey($true) | Out-Null
+    } finally {
+        [Console]::CursorVisible = $true
+    }
+}
 function ShowSystemSummary {
     Clear-Host
     Write-Host "==== System Info ====" -ForegroundColor White
@@ -422,11 +451,11 @@ function ShowSystemSummary {
 	Write-Host "(`"" -NoNewLine; Write-Host "*" -ForegroundColor Cyan -NoNewline; Write-host "`" = `"You`")"
     # Exit
     Write-Host ""
-    Read-Host "Press Enter to exit..."
+    ShowExitSpinner
 }
 
 ShowSystemSummary
 
 #CHANGELOG
 # 0.0.0 - 5/3/25 - Created.
-# 0.0.1 - 5/4/25 - Added TestAdmin and if statement to beginning to prompt user to re-run as admin, if not already done. Revised GetIPv4Address function to grab IPv4 specifically for the first adapter w Internet access. Added GetStorageInfo function. Re-worked ShowSystemSummary function output. Various formatting tweaks.
+# 0.0.1 - 5/4/25 - Added TestAdmin and if statement to beginning to prompt user to re-run as admin, if not already done. Revised GetIPv4Address function to grab IPv4 specifically for the first adapter w Internet access. Added GetStorageInfo function. Added ShowExitSpinner function. Re-worked ShowSystemSummary function output. Various formatting tweaks.
