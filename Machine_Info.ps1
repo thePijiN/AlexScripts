@@ -371,22 +371,62 @@ function GetCloudRadialInstallStatus {
 
 # DISPLAY INFO
 function ShowSystemSummary {
-   
-    Write-Host "==== System Info ====" -BackgroundColor Black -ForegroundColor White
-    Write-Host "GENERAL" -BackgroundColor DarkGray -ForegroundColor Cyan -NoNewLine; Write-Host " Device Name: " -NoNewLine; GetDeviceName; Write-Host " | S/N: " -NoNewLine; GetSerialNumber; Write-Host " | OS: " -NoNewline; GetWindowsVersion; Write-Host "" -BackgroundColor Black
-    Write-Host "NETWORK" -BackgroundColor DarkGray -ForegroundColor Cyan -NoNewLine;  Write-Host " MAC Address: " -NoNewline; GetHardwareMAC; Write-Host " | IPv4 Address: " -NoNewline; GetIPv4Address; Write-Host " | Domain Type: " -NoNewLine; GetDomainStatus;  Write-Host " | Connection Type: " -NoNewLine; GetNetworkType; Write-Host ""
-	Write-Host "SOFTWARE" -BackgroundColor DarkGray -ForegroundColor Cyan -NoNewLine; Write-Host " LTAgent ID: " -NoNewLine; GetLTAgentID; Write-Host " | Crowdstrike: " -NoNewLine; GetCrowdstrikeInstallStatus; Write-Host " | CloudRadial: " -NoNewLine; GetCloudRadialInstallStatus; Write-Host ""
-	Write-Host "==== Storage ====" -BackgroundColor Black -ForegroundColor White
-	GetStorageInfo
-    Write-Host "==== Bitlocker ====" -BackgroundColor Black -ForegroundColor White
-	GetBitlockerRecovery
-	Write-Host "==== Users ====" -BackgroundColor Black -ForegroundColor White
-	ListAllUsersWithAdminStatus
+    Clear-Host
+    Write-Host "==== System Info ====" -ForegroundColor White
+
+    # General Info
+    Write-Host (" GENERAL     ") -BackgroundColor DarkGray -ForegroundColor Cyan -NoNewline
+    Write-Host (" Device Name: ") -NoNewline
+    GetDeviceName
+    Write-Host (" | S/N: ") -NoNewline
+    GetSerialNumber
+    Write-Host (" | OS: ") -NoNewline
+    GetWindowsVersion
+    Write-Host ""
+
+    # Network Info
+    Write-Host (" NETWORK     ") -BackgroundColor DarkGray -ForegroundColor Cyan -NoNewline
+    Write-Host (" MAC Address: ") -NoNewline
+    GetHardwareMAC
+    Write-Host (" | IPv4 Addr: ") -NoNewline
+    GetIPv4Address
+    Write-Host (" | Domain: ") -NoNewline
+    GetDomainStatus
+    Write-Host (" | Connection: ") -NoNewline
+    GetNetworkType
+    Write-Host ""
+
+    # Software Info
+    Write-Host (" SOFTWARE    ") -BackgroundColor DarkGray -ForegroundColor Cyan -NoNewline
+    Write-Host (" LTAgent ID: ") -NoNewline
+    GetLTAgentID
+    Write-Host (" | Crowdstrike: ") -NoNewline
+    GetCrowdstrikeInstallStatus
+    Write-Host (" | CloudRadial: ") -NoNewline
+    GetCloudRadialInstallStatus
+    Write-Host ""
+
+    # Storage
+    Write-Host "`n==== Storage ====" -ForegroundColor White
+    GetStorageInfo
+
+    # Bitlocker
+    Write-Host "`n==== BitLocker ====" -ForegroundColor White
+    GetBitlockerRecovery
+
+    # Users
+    Write-Host "`n==== Users ====" -ForegroundColor White
+    ListAllUsersWithAdminStatus
+
+    # Legend
 	Write-Host "(`"" -NoNewLine; Write-Host "*" -ForegroundColor Cyan -NoNewline; Write-host "`" = `"You`")"
-	Write-Host ""; Read-host "Enter to exit..."
+    # Exit
+    Write-Host ""
+    Read-Host "Press Enter to exit..."
 }
+
 ShowSystemSummary
 
 #CHANGELOG
 # 0.0.0 - 5/3/25 - Created.
-# 0.0.1 - 5/4/25 - Added TestAdmin and if statement to beginning to prompt user to re-run as admin, if not already done. Revised GetIPv4Address function to grab IPv4 specifically for the first adapter w Internet access. Added GetStorageInfo function. Various formatting tweaks.
+# 0.0.1 - 5/4/25 - Added TestAdmin and if statement to beginning to prompt user to re-run as admin, if not already done. Revised GetIPv4Address function to grab IPv4 specifically for the first adapter w Internet access. Added GetStorageInfo function. Re-worked ShowSystemSummary function output. Various formatting tweaks.
