@@ -140,7 +140,7 @@ function ListAllUsersWithAdminStatus { # Lists Local and Domain/Azure accounts, 
 # HARDWARE INFO
 function GetDeviceName { # $global:DeviceName
     $global:DeviceName = $env:COMPUTERNAME
-    Write-Host "$($global:DeviceName)" -ForegroundColor Green -NoNewline
+    Write-Host "$($global:DeviceName)" -ForegroundColor Yellow -NoNewline
 }
 function GetSerialNumber { # $global:serialNumber
     $global:serialNumber = "Not Found"
@@ -158,6 +158,26 @@ function GetSerialNumber { # $global:serialNumber
         Write-Host "$($global:serialNumber)" -ForegroundColor Yellow -NoNewline
     } else {
         Write-Host "Not Found" -ForegroundColor Red -NoNewline
+    }
+}
+function GetStorageInfo { # Displays storage drives, and their free space in GB.
+    Get-PSDrive -PSProvider 'FileSystem' | ForEach-Object {
+        $drive = $_
+        $freeGB = [math]::Round($drive.Free / 1GB, 0)
+
+        # Determine color for free space
+        if ($freeGB -lt 50) {
+            $color = 'Red'
+        } elseif ($freeGB -lt 100) {
+            $color = 'Yellow'
+        } else {
+            $color = 'Green'
+        }
+
+        Write-Host "$($drive.Name):\" -ForegroundColor Cyan -NoNewline
+        Write-Host " - " -ForegroundColor White -NoNewline
+        Write-Host "$freeGB" -ForegroundColor $color -NoNewline
+        Write-Host "GB Free"
     }
 }
 # NETWORK INFO
@@ -230,7 +250,7 @@ function GetHardwareMAC { # Writes Hardware MAC Address ($global:HardwareMAC)
         Write-Host "Not Found" -ForegroundColor Red  -NoNewline
     }
 }
-function GetIPv4Address {
+function GetIPv4Address { # Writes IPv4 address for first adapter w Internet access.
     # Get the interface index for the default route (0.0.0.0/0)
     $defaultRoute = Get-NetRoute -DestinationPrefix "0.0.0.0/0" |
         Where-Object { $_.NextHop -ne "::" } |
@@ -250,7 +270,7 @@ function GetIPv4Address {
         Select-Object -ExpandProperty IPAddress -First 1
 
     if ($ipAddress) {
-        Write-Host "$ipAddress" -ForegroundColor Cyan -NoNewline
+        Write-Host "$ipAddress" -ForegroundColor Green -NoNewline
     } else {
         Write-Host "No valid IPv4 address found for active interface" -ForegroundColor Red -NoNewline
     }
@@ -352,13 +372,15 @@ function GetCloudRadialInstallStatus {
 # DISPLAY INFO
 function ShowSystemSummary {
    
-    Write-Host "==== System Info ====" -BackgroundColor Black
+    Write-Host "==== System Info ====" -BackgroundColor Black -ForegroundColor White
     Write-Host "GENERAL" -BackgroundColor DarkGray -ForegroundColor Cyan -NoNewLine; Write-Host " Device Name: " -NoNewLine; GetDeviceName; Write-Host " | S/N: " -NoNewLine; GetSerialNumber; Write-Host " | OS: " -NoNewline; GetWindowsVersion; Write-Host "" -BackgroundColor Black
     Write-Host "NETWORK" -BackgroundColor DarkGray -ForegroundColor Cyan -NoNewLine;  Write-Host " MAC Address: " -NoNewline; GetHardwareMAC; Write-Host " | IPv4 Address: " -NoNewline; GetIPv4Address; Write-Host " | Domain Type: " -NoNewLine; GetDomainStatus;  Write-Host " | Connection Type: " -NoNewLine; GetNetworkType; Write-Host ""
 	Write-Host "SOFTWARE" -BackgroundColor DarkGray -ForegroundColor Cyan -NoNewLine; Write-Host " LTAgent ID: " -NoNewLine; GetLTAgentID; Write-Host " | Crowdstrike: " -NoNewLine; GetCrowdstrikeInstallStatus; Write-Host " | CloudRadial: " -NoNewLine; GetCloudRadialInstallStatus; Write-Host ""
-    Write-Host "==== Bitlocker ====" -BackgroundColor Black
+	Write-Host "==== Storage ====" -BackgroundColor Black -ForegroundColor White
+	GetStorageInfo
+    Write-Host "==== Bitlocker ====" -BackgroundColor Black -ForegroundColor White
 	GetBitlockerRecovery
-	Write-Host "==== Users ====" -BackgroundColor Black
+	Write-Host "==== Users ====" -BackgroundColor Black -ForegroundColor White
 	ListAllUsersWithAdminStatus
 	Write-Host "(`"" -NoNewLine; Write-Host "*" -ForegroundColor Cyan -NoNewline; Write-host "`" = `"You`")"
 	Write-Host ""; Read-host "Enter to exit..."
@@ -367,4 +389,4 @@ ShowSystemSummary
 
 #CHANGELOG
 # 0.0.0 - 5/3/25 - Created.
-# 0.0.1 - 5/4/25 - Added TestAdmin and if statement to beginning to prompt user to re-run as admin, if not already done. Revised GetIPv4Address function to grab IPv4 specifically for the first adapter w Internet access. 
+# 0.0.1 - 5/4/25 - Added TestAdmin and if statement to beginning to prompt user to re-run as admin, if not already done. Revised GetIPv4Address function to grab IPv4 specifically for the first adapter w Internet access. Added GetStorageInfo function. Various formatting tweaks.
