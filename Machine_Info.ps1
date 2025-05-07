@@ -1,4 +1,4 @@
-# MACHINE_INFO.ps1 - by Alex DeMey - Displays information about the current Windows configuration
+# MACHINE_INFO.ps1 - by Alexander DeMey - Displays information about the current Windows configuration
 
 # Copyright (c) 2025 Alexander DeMey
 # All rights reserved.
@@ -11,23 +11,16 @@
 function Test-Admin { # return true/false depending on current user local admin rights
     return ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole] "Administrator")
 }
-
-if (-not (Test-Admin)) { # Check if running as admin, if not prompt for Y/N to attempt re-launch as admin
+if (-not (Test-Admin)) { # If not running as admin, prompt user to re-run as admin.
+	Write-Host "WARNING: " -ForegroundColor Red -NoNewLine
     Write-Host "This script requires administrative privileges to function correctly." -ForegroundColor Yellow
-    $response = Read-Host "Would you like to relaunch this script as Admin in Windows Terminal? (Y/N)"
+    $response = Read-Host "Y/N - Would you like to attempt to re-run as Admin?"
     
-    if ($response -eq 'Y') {
-        # Relaunch script in Windows Terminal as admin
-        $wtPath = "wt.exe"
-
-        # We need to escape the script path correctly
-        $scriptPath = "`"$PSCommandPath`""
-
-        # Start Windows Terminal with admin privileges, running PowerShell script in the default profile
-        Start-Process $wtPath -ArgumentList "powershell.exe -NoExit -File $scriptPath" -Verb RunAs
+    if ($response -eq 'Y') { # If Y, run as admin
+        Start-Process powershell.exe -ArgumentList "-File `"$PSCommandPath`"" -Verb RunAs
         exit  # Exit current session after relaunching
-    } elseif ($response -eq 'N') {
-        Write-Host "Proceeding without admin rights..." -ForegroundColor Yellow
+    } elseif ($response -eq 'N') { # If N, run anyway...
+        Write-Host "Proceeding without admin rights..." -ForegroundColor Red
     }
 }
 
@@ -493,4 +486,4 @@ ShowSystemSummary
 #CHANGELOG
 # 0.0.0 - 5/3/25 - Created.
 # 0.0.1 - 5/4/25 - Added TestAdmin and if statement to beginning to prompt user to re-run as admin, if not already done. Revised GetIPv4Address function to grab IPv4 specifically for the first adapter w Internet access. Added GetStorageInfo function. Added ShowExitSpinner function. Re-worked ShowSystemSummary function output. Various formatting tweaks.
-# 0.0.2 - 5/6/25 - Updated GetWindowsVersion function to now check build, and if above 22000 report "11" instead of "10". Updated GetLTAgentID function so color is based off a .txt file indicative of installation, to portray when installed but no ID. Added GetCurrentUserIdentity function to display who ran script, with color to indicate admin. Added GetWindowsActivationKey function to display current Windows Activation Key. Revised ShowSystemSummary function's output to better accomodate smaller screens and additional information. Added comments, improved formatting.
+# 0.0.2 - 5/6/25 - Updated GetWindowsVersion function to now check build, and if above 22000 report "11" instead of "10". Updated GetLTAgentID function so color is based off a .txt file indicative of installation, to portray when installed but no ID. Added GetCurrentUserIdentity function to display who ran script, with color to indicate admin. Added GetWindowsActivationKey function to display current Windows Activation Key. Revised ShowSystemSummary function's output to better accomodate smaller screens and additional information. Revised opening if statement when running as non-admin. Added comments, improved formatting.
