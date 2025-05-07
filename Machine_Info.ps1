@@ -8,12 +8,11 @@
 # Licensed for use solely within the scope of current professional engagement.
 # Any use, reproduction, or distribution outside of that scope shall require prior, written authorization from the author.
 
-function Test-Admin {
+function Test-Admin { # return true/false depending on current user local admin rights
     return ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole] "Administrator")
 }
 
-# Check if running as admin, if not prompt for Y/N to attempt re-launch as admin
-if (-not (Test-Admin)) {
+if (-not (Test-Admin)) { # Check if running as admin, if not prompt for Y/N to attempt re-launch as admin
     Write-Host "This script requires administrative privileges to function correctly." -ForegroundColor Yellow
     $response = Read-Host "Would you like to relaunch this script as Admin in Windows Terminal? (Y/N)"
     
@@ -136,7 +135,6 @@ function ListAllUsersWithAdminStatus { # Lists Local and Domain/Azure accounts, 
         }
     }
 }
-
 # HARDWARE INFO
 function GetDeviceName { # $global:DeviceName
     $global:DeviceName = $env:COMPUTERNAME
@@ -239,7 +237,6 @@ function GetDomainStatus { # Writes Domain Join Status ($global:DomainStatus), a
         Write-Host "None" -ForegroundColor Red -NoNewline
     }
 }
-
 function GetHardwareMAC { # Writes Hardware MAC Address ($global:HardwareMAC)
     $MAC = Get-NetAdapter | Where-Object { $_.Status -eq 'Up' -and !$_.Virtual } | Select-Object -ExpandProperty MacAddress
     if ($MAC) {
@@ -276,7 +273,7 @@ function GetIPv4Address { # Writes IPv4 address for first adapter w Internet acc
     }
 }
 # SOFTWARE INFO
-function GetWindowsVersion { # $global:WindowsVersion
+function GetWindowsVersion { # $global:WindowsVersion, contains OS Name, feature update version, and build number
     try {
         $winRegPath = "HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion"
         $props = Get-ItemProperty -Path $winRegPath
@@ -284,19 +281,26 @@ function GetWindowsVersion { # $global:WindowsVersion
         $productName = $props.ProductName
         $releaseId = $props.ReleaseId
         $displayVersion = $props.DisplayVersion
-        $currentBuild = $props.CurrentBuild
+        $currentBuild = [int]$props.CurrentBuild
         $ubr = $props.UBR  # Update Build Revision
 
-        # Construct OS Build (e.g., 22631.3447)
         $osBuild = "$currentBuild.$ubr"
+
+        # Determine proper base OS name based on build number
+        $osName =
+            if ($currentBuild -ge 22000) {  # Windows 11 starts at build 22000
+                $productName -replace "Windows 10", "Windows 11"
+            } else {
+                $productName
+            }
 
         # Choose either DisplayVersion or ReleaseId for feature update info
         $featureUpdate = if ($displayVersion) { $displayVersion } elseif ($releaseId) { $releaseId } else { "Unknown" }
 
-        $global:WindowsVersion = "$productName - $featureUpdate - Build $osBuild"
+        $global:WindowsVersion = "$osName - $featureUpdate - Build $osBuild"
 
         Write-Host $global:WindowsVersion -ForegroundColor Black -BackgroundColor Cyan -NoNewline
-		Write-Host "" -NoNewLine
+        Write-Host "" -NoNewLine
     } catch {
         $global:WindowsVersion = "Not Found"
         Write-Host "Not Found" -ForegroundColor Red -NoNewline
@@ -304,19 +308,21 @@ function GetWindowsVersion { # $global:WindowsVersion
 }
 function GetLTAgentID { # $global:LTAgentID
     $global:LTAgentID = "Not Found"
+    $LTErrorsPath = "C:\Windows\LTSvC\LTErrors.txt"
+    $isInstalled = Test-Path $LTErrorsPath
 
     try {
-        $LTagentID = Get-ItemProperty -Path "HKLM:\SOFTWARE\LabTech\Service" -Name "ID" -ErrorAction Stop
-        if ($LTagentID.ID -ne $null) {
-            $global:LTAgentID = $LTagentID.ID
-            Write-Host "$($global:LTAgentID)" -ForegroundColor Green -NoNewline
-            return
+        $LTagent = Get-ItemProperty -Path "HKLM:\SOFTWARE\LabTech\Service" -Name "ID" -ErrorAction Stop
+        if ($LTagent.ID) {
+            $global:LTAgentID = $LTagent.ID
         }
     } catch {
         # Silent fail
     }
 
-    Write-Host "Not Found" -ForegroundColor Red -NoNewline
+    # Output with status-aware coloring
+    $color = if ($isInstalled) { "Green" } else { "Red" }
+    Write-Host $global:LTAgentID -ForegroundColor $color -NoNewline
 }
 function GetBitlockerRecovery { # Write-Hosts ID and Key for latest Bitlocker 
     $bitlockerInfo = Get-BitLockerVolume -MountPoint "C:" -ErrorAction SilentlyContinue
@@ -352,7 +358,7 @@ function GetBitlockerRecovery { # Write-Hosts ID and Key for latest Bitlocker
     }
     #>
 }
-function GetCrowdstrikeInstallStatus {
+function GetCrowdstrikeInstallStatus { # Says "Detected" or "Not Found" based on Crowdstrike path existance.
     $exists = Test-Path "C:\Program Files\CrowdStrike"
     if ($exists) {
         Write-Host "Detected" -ForegroundColor Green -NoNewline
@@ -360,7 +366,7 @@ function GetCrowdstrikeInstallStatus {
         Write-Host "Not Found" -ForegroundColor Red -NoNewline
     }
 }
-function GetCloudRadialInstallStatus {
+function GetCloudRadialInstallStatus { # Says "Detected" or "Not Found" based on CloudRadial executable existance.
     $exists = Test-Path "C:\Program Files (x86)\CloudRadial Agent\CloudRadial.Agent.exe"
     if ($exists) {
         Write-Host "Detected" -ForegroundColor Green -NoNewline
@@ -370,7 +376,7 @@ function GetCloudRadialInstallStatus {
 }
 
 # DISPLAY INFO
-function ShowExitSpinner {
+function ShowExitSpinner { # Exit spinner - animation; continues on keystroke
     $spinnerChars = @('|', '/', '-', '\')
     $spinnerIndex = 0
     $promptBase = "Press any key to exit"
@@ -399,7 +405,7 @@ function ShowExitSpinner {
         [Console]::CursorVisible = $true
     }
 }
-function ShowSystemSummary {
+function ShowSystemSummary { # Displays system information to user
     Clear-Host
     Write-Host "==== System Info ====" -ForegroundColor White
 
@@ -459,3 +465,4 @@ ShowSystemSummary
 #CHANGELOG
 # 0.0.0 - 5/3/25 - Created.
 # 0.0.1 - 5/4/25 - Added TestAdmin and if statement to beginning to prompt user to re-run as admin, if not already done. Revised GetIPv4Address function to grab IPv4 specifically for the first adapter w Internet access. Added GetStorageInfo function. Added ShowExitSpinner function. Re-worked ShowSystemSummary function output. Various formatting tweaks.
+# 0.0.2 - 5/6/25 - Updated GetWindowsVersion function to now check build, and if above 22000 report "11" instead of "10". Updated GetLTAgentID function so color is based off a .txt file indicative of installation, to portray when installed but no ID. Added comments, formatting.
