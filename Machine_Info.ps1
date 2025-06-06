@@ -164,8 +164,9 @@ function Show-UserProfiles { # Lists all users in C:\users, classified by type, 
 
     $currentUser = $env:USERNAME
     $profiles = Get-ChildItem "C:\Users" -Directory | Where-Object {
-        $_.Name -notin $excludedSystemProfiles
-    }
+		$_.Name -notin $excludedSystemProfiles -and
+		(Test-Path (Join-Path $_.FullName "Downloads"))
+	}
 
     $localOutput  = @()
     $domainOutput = @()
