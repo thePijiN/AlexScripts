@@ -56,7 +56,7 @@ function GetCurrentUserIdentity { # Shows the current user's name, in green text
         Write-Host "Unknown (identity detection failed)" -ForegroundColor DarkRed -BackgroundColor White -NoNewLine
     }
 }
-function ListAllUsersWithAdminStatus { # Lists Local and Domain/Azure accounts, as well as info on each. 
+<#function ListAllUsersWithAdminStatus { # Lists Local and Domain/Azure accounts, as well as info on each. 
     $adminGroupMembers = Get-LocalGroupMember -Group "Administrators" -ErrorAction SilentlyContinue
     $currentUserFull = [System.Security.Principal.WindowsIdentity]::GetCurrent().Name
     $currentUserShort = $currentUserFull.Split('\')[-1]
@@ -138,6 +138,172 @@ function ListAllUsersWithAdminStatus { # Lists Local and Domain/Azure accounts, 
 
             Write-Host "$($member.Name) " -NoNewline -ForegroundColor White
             Write-Host "(Admin) (AAD/Domain Account)" -ForegroundColor Green
+        }
+    }
+}
+#>
+function Show-UserProfiles { # Lists all users in C:\users, classified by type, with additional info. 
+    Write-Host "`n==== Users ===="
+
+    $excludedSystemProfiles = @('Public','Default','Default User','All Users','WDAGUtilityAccount')
+    $excludedLocalAccounts  = @('Administrator','Guest','DefaultAccount','WDAGUtilityAccount')
+
+    $adminMembers = Get-LocalGroupMember -Group "Administrators" -ErrorAction SilentlyContinue
+    $adminSIDs = $adminMembers.SID.Value
+    $adminNames = $adminMembers.Name
+
+    $localUsers = Get-LocalUser -ErrorAction SilentlyContinue | Where-Object {
+        $_.Name -notin $excludedLocalAccounts
+    }
+
+    $localUserMap = @{}
+    foreach ($user in $localUsers) {
+        $localUserMap[$user.Name] = @{
+            IsAdmin = $adminSIDs -contains $user.SID.Value
+            Enabled = $user.Enabled
+        }
+    }
+
+    $currentUser = $env:USERNAME
+    $profiles = Get-ChildItem "C:\Users" -Directory | Where-Object {
+        $_.Name -notin $excludedSystemProfiles
+    }
+
+    $localOutput  = @()
+    $domainOutput = @()
+    $azureOutput  = @()
+    $seenAccounts = @()
+
+    foreach ($profile in $profiles) {
+        $name = $profile.Name
+        $isCurrent = $name -ieq $currentUser
+        $prefix = if ($isCurrent) { "* " } else { "- " }
+
+        if ($localUserMap.ContainsKey($name)) {
+            $entry = @{
+                Prefix = $prefix
+                Name   = $name
+                Admin  = $localUserMap[$name].IsAdmin
+                Enabled = $localUserMap[$name].Enabled
+                Current = $isCurrent
+            }
+            $localOutput += $entry
+            $seenAccounts += $name
+        }
+        elseif ($name -match '\\' -or $name -match '^[\w-]+\.[\w-]+$') {
+            $sid = try {
+                (New-Object System.Security.Principal.NTAccount($name)).Translate([System.Security.Principal.SecurityIdentifier]).Value
+            } catch { $null }
+
+            $domainOutput += @{
+                Prefix = $prefix
+                Name   = $name
+                Admin  = $sid -and ($adminSIDs -contains $sid)
+                Current = $isCurrent
+            }
+            $seenAccounts += $name
+        }
+        else {
+            $sid = try {
+                (New-Object System.Security.Principal.NTAccount("AzureAD\$name")).Translate([System.Security.Principal.SecurityIdentifier]).Value
+            } catch { $null }
+
+            $azureOutput += @{
+                Prefix = $prefix
+                Name   = $name
+                Admin  = $sid -and ($adminSIDs -contains $sid)
+                Current = $isCurrent
+            }
+            $seenAccounts += $name
+        }
+    }
+
+    if ($localOutput.Count -gt 0) {
+        Write-Host "~~~" -NoNewLine
+        Write-Host "Local Users" -NoNewLine -ForegroundColor Green
+        Write-Host "~~~"
+        foreach ($user in $localOutput) {
+            if ($user.Current) {
+                Write-Host "$($user.Prefix)" -ForegroundColor Cyan -NoNewline
+				Write-Host "$($user.Name)" -NoNewLine
+            } else {
+                Write-Host "$($user.Prefix)$($user.Name)" -NoNewline
+            }
+
+            if (-not $user.Enabled) {
+                Write-Host " (DISABLED)" -ForegroundColor Red
+            } elseif ($user.Admin) {
+                Write-Host " (" -NoNewline
+                Write-Host "Admin" -ForegroundColor Green -NoNewline
+                Write-Host ")"
+            } else {
+                Write-Host ""
+            }
+        }
+    }
+
+    if ($domainOutput.Count -gt 0) {
+        Write-Host "~~~" -NoNewLine
+        Write-Host "Domain Users" -NoNewLine -ForegroundColor Yellow
+        Write-Host "~~~"
+        foreach ($user in $domainOutput) {
+            if ($user.Current) {
+                Write-Host "$($user.Prefix)$($user.Name)" -ForegroundColor Cyan -NoNewline
+            } else {
+                Write-Host "$($user.Prefix)$($user.Name)" -NoNewline
+            }
+
+            if ($user.Admin) {
+                Write-Host " (" -NoNewline
+                Write-Host "Admin" -ForegroundColor Green -NoNewline
+                Write-Host ")"
+            } else {
+                Write-Host ""
+            }
+        }
+    }
+
+    if ($azureOutput.Count -gt 0) {
+        Write-Host "~~~" -NoNewLine
+        Write-Host "Azure/Entra Users" -NoNewLine -ForegroundColor Cyan
+        Write-Host "~~~"
+        foreach ($user in $azureOutput) {
+            if ($user.Current) {
+                Write-Host "$($user.Prefix)$($user.Name)" -ForegroundColor Cyan -NoNewline
+            } else {
+                Write-Host "$($user.Prefix)$($user.Name)" -NoNewline
+            }
+
+            if ($user.Admin) {
+                Write-Host " (" -NoNewline
+                Write-Host "Admin" -ForegroundColor Green -NoNewline
+                Write-Host ")"
+            } else {
+                Write-Host ""
+            }
+        }
+    }
+
+    # Show Admins injected by policy
+    $policyAdmins = @()
+    foreach ($admin in $adminMembers) {
+        if (
+            $admin.ObjectClass -ne 'User' -or
+            ($admin.Name -notmatch '^.+\\.+$') -or
+            ($admin.Name -in $seenAccounts)
+        ) { continue }
+
+        if ($admin.Name -notin $seenAccounts) {
+            $policyAdmins += $admin.Name
+        }
+    }
+
+    if ($policyAdmins.Count -gt 0) {
+        Write-Host "~~~" -NoNewLine
+        Write-Host "Admins by Policy" -NoNewLine -ForegroundColor Magenta
+        Write-Host "~~~"
+        foreach ($name in $policyAdmins) {
+            Write-Host "- $name"
         }
     }
 }
@@ -278,6 +444,45 @@ function GetIPv4Address { # Writes IPv4 address for first adapter w Internet acc
         Write-Host "No valid IPv4 address found for active interface" -ForegroundColor Red -NoNewline
     }
 }
+function Show-KnownWiFiNetworks { # Displays known WiFi connections. Specifies whether machine-wide or user-specific
+    Write-Host "`n==== Wi-Fi Networks ===="
+
+    # Retrieve all profile lines
+    $allProfilesOutput = netsh wlan show profiles
+
+    # Parse system-wide profiles
+    $systemProfiles = ($allProfilesOutput | Select-String "All User Profile") | ForEach-Object {
+        if ($_ -match ":\s*(.+)$") { $matches[1].Trim() }
+    }
+
+    if ($systemProfiles.Count -gt 0) {
+        Write-Host "~~~" -NoNewLine
+		Write-Host "System-Wide" -NoNewLine -ForegroundColor green
+		Write-Host "~~~"
+        foreach ($profile in $systemProfiles) {
+            Write-Host "- $profile"
+        }
+    } else {
+        Write-Host "No system-wide profiles found."
+    }
+
+    # Parse user-specific profiles
+    $userProfiles = ($allProfilesOutput | Select-String "User Profile") | ForEach-Object {
+        if ($_ -match ":\s*(.+)$") { $matches[1].Trim() }
+    }
+
+    # Filter out system-wide entries to get user-only
+    $userOnlyProfiles = $userProfiles | Where-Object { $systemProfiles -notcontains $_ }
+
+    if ($userOnlyProfiles.Count -gt 0) {
+		Write-Host "~~~" -NoNewLine
+		Write-Host "User-Specific (Current User)" -NoNewLine -ForegroundColor cyan
+		Write-Host "~~~"
+        foreach ($profile in $userOnlyProfiles) {
+            Write-Host "- $profile"
+        }
+    }
+}
 # SOFTWARE INFO
 function GetWindowsVersion { # $global:WindowsVersion, contains OS Name, feature update version, and build number
     try {
@@ -387,6 +592,49 @@ function GetCloudRadialInstallStatus { # Says "Detected" or "Not Found" based on
         Write-Host "Not Found" -ForegroundColor Red -NoNewline
     }
 }
+function Show-MappedPrinters { # Displays mapped printers. Specifies whether machine-wide or user-specific 
+    Write-Host "`n==== Printers ===="
+
+    # Get all installed printers and check for Microsoft Print to PDF
+    $printers = Get-Printer -ErrorAction SilentlyContinue
+    $hasPdfPrinter = $printers.Name -contains "Microsoft Print to PDF"
+    $filteredPrinters = $printers | Where-Object { $_.Name -ne "Microsoft Print to PDF" }
+
+    # Display system-wide printers
+    if ($filteredPrinters) {
+        Write-Host "~~~" -NoNewLine
+		Write-Host "System-Wide" -NoNewLine -ForegroundColor green
+		Write-Host "~~~"
+        foreach ($printer in $filteredPrinters) {
+            Write-Host "- $($printer.Name)"
+        }
+    } else {
+        Write-Host "No non-PDF printers found."
+    }
+
+    # Display user-mapped printers
+    try {
+        $userPrinters = Get-ChildItem -Path "HKCU:\Printers\Connections" -ErrorAction Stop |
+            ForEach-Object {
+                ($_.Name -split "\\")[-1] -replace ",", "\"
+            }
+
+        if ($userPrinters.Count -gt 0) {
+            Write-Host "~~~" -NoNewLine
+		Write-Host "User-Specific (current user)" -NoNewLine -ForegroundColor cyan
+		Write-Host "~~~"
+            foreach ($printer in $userPrinters) {
+                Write-Host "- $printer"
+            }
+        }
+    } catch {
+        # No user-mapped printers
+    }
+
+    if (-not $hasPdfPrinter) {
+        Write-Host "`nWARNING: 'Microsoft Print to PDF' is missing from this system!" -ForegroundColor Red
+    }
+}
 
 # DISPLAY INFO
 function ShowExitSpinner { # Exit spinner - animation; continues on keystroke
@@ -471,8 +719,13 @@ function ShowSystemSummary { # Displays system information to user
     GetBitlockerRecovery
 
     # Users
-    Write-Host "`n==== Users ====" -ForegroundColor White
-    ListAllUsersWithAdminStatus
+    Show-UserProfiles
+	
+	# WiFi profiles
+	Show-KnownWiFiNetworks
+	
+	# Printers
+	Show-MappedPrinters
 
     # Legend
 	Write-Host "(`"" -NoNewLine; Write-Host "*" -ForegroundColor Cyan -NoNewline; Write-host "`" = `"You`")"
@@ -487,3 +740,4 @@ ShowSystemSummary
 # 0.0.0 - 5/3/25 - Created.
 # 0.0.1 - 5/4/25 - Added TestAdmin and if statement to beginning to prompt user to re-run as admin, if not already done. Revised GetIPv4Address function to grab IPv4 specifically for the first adapter w Internet access. Added GetStorageInfo function. Added ShowExitSpinner function. Re-worked ShowSystemSummary function output. Various formatting tweaks.
 # 0.0.2 - 5/6/25 - Updated GetWindowsVersion function to now check build, and if above 22000 report "11" instead of "10". Updated GetLTAgentID function so color is based off a .txt file indicative of installation, to portray when installed but no ID. Added GetCurrentUserIdentity function to display who ran script, with color to indicate admin. Added GetWindowsActivationKey function to display current Windows Activation Key. Revised ShowSystemSummary function's output to better accomodate smaller screens and additional information. Revised opening if statement when running as non-admin. Added comments, improved formatting.
+# 0.0.3 - 6/6/25 - Replaced ListAllUsersWithAdminStatus function with Show-UserProfiles function. Added Show-UserProfiles, Show-KnownWiFiNetworks, and Show-MappedPrinters functions to report additional information.
