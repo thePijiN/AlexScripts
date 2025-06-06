@@ -143,8 +143,6 @@ function GetCurrentUserIdentity { # Shows the current user's name, in green text
 }
 #>
 function Show-UserProfiles { # Lists all users in C:\users, classified by type, with additional info. 
-    Write-Host "`n==== Users ===="
-
     $excludedSystemProfiles = @('Public','Default','Default User','All Users','WDAGUtilityAccount')
     $excludedLocalAccounts  = @('Administrator','Guest','DefaultAccount','WDAGUtilityAccount')
 
@@ -445,8 +443,6 @@ function GetIPv4Address { # Writes IPv4 address for first adapter w Internet acc
     }
 }
 function Show-KnownWiFiNetworks { # Displays known WiFi connections. Specifies whether machine-wide or user-specific
-    Write-Host "`n==== Wi-Fi Networks ===="
-
     # Retrieve all profile lines
     $allProfilesOutput = netsh wlan show profiles
 
@@ -593,8 +589,6 @@ function GetCloudRadialInstallStatus { # Says "Detected" or "Not Found" based on
     }
 }
 function Show-MappedPrinters { # Displays mapped printers. Specifies whether machine-wide or user-specific 
-    Write-Host "`n==== Printers ===="
-
     # Get all installed printers and check for Microsoft Print to PDF
     $printers = Get-Printer -ErrorAction SilentlyContinue
     $hasPdfPrinter = $printers.Name -contains "Microsoft Print to PDF"
@@ -668,7 +662,7 @@ function ShowExitSpinner { # Exit spinner - animation; continues on keystroke
 }
 function ShowSystemSummary { # Displays system information to user
     Clear-Host
-    Write-Host "==== System Info ====" -ForegroundColor White
+    Write-Host "==== System Info ====" -ForegroundColor White -BackgroundColor DarkBlue
 
     # General Info
     Write-Host (" GENERAL     ") -BackgroundColor DarkGray -ForegroundColor Cyan -NoNewline
@@ -711,20 +705,23 @@ function ShowSystemSummary { # Displays system information to user
     Write-Host ""
 
     # Storage
-    Write-Host "`n==== Storage ====" -ForegroundColor White
+    Write-Host "`n==== Storage ====" -ForegroundColor White -BackgroundColor DarkBlue
     GetStorageInfo
 
     # Bitlocker
-    Write-Host "`n==== BitLocker ====" -ForegroundColor White
+    Write-Host "`n==== BitLocker ====" -ForegroundColor White -BackgroundColor DarkBlue
     GetBitlockerRecovery
 
     # Users
+	Write-Host "`n==== Users ====" -ForegroundColor White -BackgroundColor DarkBlue
     Show-UserProfiles
 	
 	# WiFi profiles
+	Write-Host "`n==== Wi-Fi Networks ====" -ForegroundColor White -BackgroundColor DarkBlue
 	Show-KnownWiFiNetworks
 	
 	# Printers
+	Write-Host "`n==== Printers ====" -ForegroundColor White -BackgroundColor DarkBlue
 	Show-MappedPrinters
 
     # Legend
