@@ -418,7 +418,7 @@ function GetHardwareMAC { # Writes Hardware MAC Address ($global:HardwareMAC)
         Write-Host "Not Found" -ForegroundColor Red  -NoNewline
     }
 }
-function GetIPv4Address { # Writes IPv4 address for first adapter w Internet access.
+function GetIPv4AddressInt { # Writes IPv4 address for first adapter w Internet access.
     # Get the interface index for the default route (0.0.0.0/0)
     $interfaces = Get-NetIPConfiguration |
         Where-Object {
@@ -445,6 +445,14 @@ function GetIPv4Address { # Writes IPv4 address for first adapter w Internet acc
         Write-Host "$ipAddress" -ForegroundColor Green -NoNewline
     } else {
         Write-Host "No valid IPv4 address found" -ForegroundColor Red -NoNewline
+    }
+}
+function GetIPv4AddressExt {
+	try {
+        $ipExt = Invoke-RestMethod -Uri "https://api.ipify.org"
+        Write-Host "$ipExt" -ForegroundColor Green -NoNewLine
+    } catch {
+        Write-Host "Unable to retrieve external IP." -ForegroundColor Red
     }
 }
 function Show-KnownWiFiNetworks { # Displays known WiFi connections. Specifies whether machine-wide or user-specific
@@ -689,8 +697,10 @@ function ShowSystemSummary { # Displays system information to user
     Write-Host (" NETWORK     ") -BackgroundColor DarkGray -ForegroundColor Cyan -NoNewline
     Write-Host (" MAC Address: ") -NoNewline
     GetHardwareMAC
-    Write-Host (" | IPv4 Addr: ") -NoNewline
-    GetIPv4Address
+    Write-Host (" | IPv4 - Int: ") -NoNewline
+    GetIPv4AddressInt
+	Write-Host (", Ext: ") -NoNewLine 
+	GetIPv4AddressExt
 	# Network Info - line 2
 	Write-Host "`n             " -BackgroundColor DarkGray -ForegroundColor Cyan -NoNewline
     Write-Host (" Domain: ") -NoNewline
@@ -740,7 +750,8 @@ ShowSystemSummary
 
 #CHANGELOG
 # 0.0.0 - 5/3/25 - Created.
-# 0.0.1 - 5/4/25 - Added TestAdmin and if statement to beginning to prompt user to re-run as admin, if not already done. Revised GetIPv4Address function to grab IPv4 specifically for the first adapter w Internet access. Added GetStorageInfo function. Added ShowExitSpinner function. Re-worked ShowSystemSummary function output. Various formatting tweaks.
+# 0.0.1 - 5/4/25 - Added TestAdmin and if statement to beginning to prompt user to re-run as admin, if not already done. Revised GetIPv4AddressInt function to grab IPv4 specifically for the first adapter w Internet access. Added GetStorageInfo function. Added ShowExitSpinner function. Re-worked ShowSystemSummary function output. Various formatting tweaks.
 # 0.0.2 - 5/6/25 - Updated GetWindowsVersion function to now check build, and if above 22000 report "11" instead of "10". Updated GetLTAgentID function so color is based off a .txt file indicative of installation, to portray when installed but no ID. Added GetCurrentUserIdentity function to display who ran script, with color to indicate admin. Added GetWindowsActivationKey function to display current Windows Activation Key. Revised ShowSystemSummary function's output to better accomodate smaller screens and additional information. Revised opening if statement when running as non-admin. Added comments, improved formatting.
 # 0.0.3 - 6/6/25 - Replaced ListAllUsersWithAdminStatus function with Show-UserProfiles function. Added Show-UserProfiles, Show-KnownWiFiNetworks, and Show-MappedPrinters functions to report additional information.
-# 0.0.4 - 6/9/25 - Revised GetIPv4Address function to be more robust/accurate.
+# 0.0.4 - 6/9/25 - Revised GetIPv4AddressInt function to be more robust/accurate.
+# 0.0.5 - 6/9/25 - Added function GetIPv4AddressExt and renamed GetIPv4Address to GetIPv4AddressInt.
