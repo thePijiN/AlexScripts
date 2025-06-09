@@ -720,6 +720,8 @@ function ShowSystemSummary { # Displays system information to user
     # Users
 	Write-Host "`n==== Users ====" -ForegroundColor White -BackgroundColor DarkBlue
     Show-UserProfiles
+	# Legend
+	Write-Host "(`"" -NoNewLine; Write-Host "*" -ForegroundColor Cyan -NoNewline; Write-host "`" = `"You`")"
 	
 	# WiFi profiles
 	Write-Host "`n==== Wi-Fi Networks ====" -ForegroundColor White -BackgroundColor DarkBlue
@@ -729,8 +731,6 @@ function ShowSystemSummary { # Displays system information to user
 	Write-Host "`n==== Printers ====" -ForegroundColor White -BackgroundColor DarkBlue
 	Show-MappedPrinters
 
-    # Legend
-	Write-Host "(`"" -NoNewLine; Write-Host "*" -ForegroundColor Cyan -NoNewline; Write-host "`" = `"You`")"
     # Exit
     Write-Host ""
     ShowExitSpinner
