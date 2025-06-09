@@ -420,27 +420,31 @@ function GetHardwareMAC { # Writes Hardware MAC Address ($global:HardwareMAC)
 }
 function GetIPv4Address { # Writes IPv4 address for first adapter w Internet access.
     # Get the interface index for the default route (0.0.0.0/0)
-    $defaultRoute = Get-NetRoute -DestinationPrefix "0.0.0.0/0" |
-        Where-Object { $_.NextHop -ne "::" } |
-        Sort-Object -Property RouteMetric |
-        Select-Object -First 1
+    $interfaces = Get-NetIPConfiguration |
+        Where-Object {
+            $_.IPv4DefaultGateway -ne $null -and
+            $_.NetAdapter.Status -eq 'Up' -and
+            $_.IPv4Address.IPAddress -notlike '169.254.*'
+        }
 
-    if ($null -eq $defaultRoute) {
-        Write-Host "No active internet-connected IPv4 adapter found" -ForegroundColor Red -NoNewline
+    if ($interfaces.Count -eq 0) {
+        Write-Host "No valid IPv4 address found for active interface" -ForegroundColor Red -NoNewline
         return
     }
 
-    $ifIndex = $defaultRoute.InterfaceIndex
+    # Prefer Ethernet over Wi-Fi if both are valid
+    $preferred = $interfaces | Sort-Object {
+        if ($_.NetAdapter.InterfaceDescription -match "Ethernet") { 0 }
+        elseif ($_.NetAdapter.InterfaceDescription -match "Wi-Fi|Wireless") { 1 }
+        else { 2 }
+    }
 
-    # Get the corresponding IPv4 address
-    $ipAddress = Get-NetIPAddress -AddressFamily IPv4 -InterfaceIndex $ifIndex |
-        Where-Object { $_.IPAddress -notlike '169.254.*' } |  # Exclude APIPA
-        Select-Object -ExpandProperty IPAddress -First 1
+    $ipAddress = $preferred[0].IPv4Address.IPAddress
 
     if ($ipAddress) {
         Write-Host "$ipAddress" -ForegroundColor Green -NoNewline
     } else {
-        Write-Host "No valid IPv4 address found for active interface" -ForegroundColor Red -NoNewline
+        Write-Host "No valid IPv4 address found" -ForegroundColor Red -NoNewline
     }
 }
 function Show-KnownWiFiNetworks { # Displays known WiFi connections. Specifies whether machine-wide or user-specific
@@ -739,3 +743,4 @@ ShowSystemSummary
 # 0.0.1 - 5/4/25 - Added TestAdmin and if statement to beginning to prompt user to re-run as admin, if not already done. Revised GetIPv4Address function to grab IPv4 specifically for the first adapter w Internet access. Added GetStorageInfo function. Added ShowExitSpinner function. Re-worked ShowSystemSummary function output. Various formatting tweaks.
 # 0.0.2 - 5/6/25 - Updated GetWindowsVersion function to now check build, and if above 22000 report "11" instead of "10". Updated GetLTAgentID function so color is based off a .txt file indicative of installation, to portray when installed but no ID. Added GetCurrentUserIdentity function to display who ran script, with color to indicate admin. Added GetWindowsActivationKey function to display current Windows Activation Key. Revised ShowSystemSummary function's output to better accomodate smaller screens and additional information. Revised opening if statement when running as non-admin. Added comments, improved formatting.
 # 0.0.3 - 6/6/25 - Replaced ListAllUsersWithAdminStatus function with Show-UserProfiles function. Added Show-UserProfiles, Show-KnownWiFiNetworks, and Show-MappedPrinters functions to report additional information.
+# 0.0.4 - 6/9/25 - Revised GetIPv4Address function to be more robust/accurate.
