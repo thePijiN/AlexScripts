@@ -3,6 +3,7 @@ Clear-Host
 # region ##### GAME INITIALIZER #####
 function Start-NewGame {
 
+##### PLAYER #####
     $global:Player = @{
         Credits   = 1000
         HP        = 100
@@ -38,6 +39,7 @@ function Start-NewGame {
 		}
 	}
 	
+	##### Values for Resources #####
 	$global:ResourceValues = @{
 		"Iron" = 20
 		"Silicates" = 15
@@ -301,7 +303,8 @@ function Show-Header {
     Write-Host -NoNewline " | FL="
     Write-Host -NoNewline "$($Player.Fuel)%" -ForegroundColor (Get-HPColor $Player.Fuel)
 	Write-Host -NoNewline " | WT="
-    Write-Host -NoNewline "$inventoryWeight" -ForegroundColor (Get-HPColor -value $inventoryWeight -UpBand 90 -UpBandColor "DarkRed" -MidBand 75 -MidBandColor "Red" -LowBand 50 -LowBandColor "Yellow" -EmptyBandColor "Green") 
+    $wtColor = Get-HPColor -value $inventoryWeight -UpBand 90 -UpBandColor "DarkRed" -MidBand 75 -MidBandColor "Red" -LowBand 50 -LowBandColor "Yellow" -EmptyBandColor "Green"
+    Write-Host -NoNewline "$inventoryWeight" -ForegroundColor $wtColor
 	Write-Host -NoNewline "/$($Player.MaxWeight)" 
     Write-Host -NoNewline " | Orbiting: "
     Write-Host -NoNewline $Player.Location -ForegroundColor (Get-HazardColor $planetData.Hazard)
@@ -521,56 +524,58 @@ function Show-Inventory { # INVENTORY MENU
 
 		
         Show-Header
-		Write-Host -NoNewLine "##### "-ForegroundColor DarkYellow
-		Write-Host -NoNewLine "CARGO HOLD" -ForegroundColor Cyan
-		Write-Host -NoNewLine " #####"-ForegroundColor DarkYellow
-		Write-Host -NoNewLine " [ " -ForegroundColor Blue
-		Write-Host -NoNewLine " Total Value: "
-		Write-Host -NoNewLine "$inventoryWorth" -ForegroundColor Green 
-		Write-Host -NoNewLine "CD"
-		Write-Host -NoNewLine " | " -ForegroundColor Blue
-		Write-Host -NoNewLine " Total Weight: "
-		Write-Host -NoNewLine "$inventoryWeight" -ForegroundColor (Get-HPColor -value $inventoryWeight -UpBand 90 -UpBandColor "DarkRed" -MidBand 75 -MidBandColor "Red" -LowBand 50 -LowBandColor "Yellow" -EmptyBandColor "Green") 
-		Write-Host -NoNewLine "kg"
+		Write-Host -NoNewline "##### "-ForegroundColor DarkYellow
+		Write-Host -NoNewline "CARGO HOLD" -ForegroundColor Cyan
+		Write-Host -NoNewline " #####"-ForegroundColor DarkYellow
+		Write-Host -NoNewline " [ " -ForegroundColor Blue
+		Write-Host -NoNewline " Total Value: "
+		Write-Host -NoNewline "$inventoryWorth" -ForegroundColor Green 
+		Write-Host -NoNewline "CD"
+		Write-Host -NoNewline " | " -ForegroundColor Blue
+		Write-Host -NoNewline " Total Weight: "
+        $invWtColor = Get-HPColor -value $inventoryWeight -UpBand 90 -UpBandColor "DarkRed" -MidBand 75 -MidBandColor "Red" -LowBand 50 -LowBandColor "Yellow" -EmptyBandColor "Green"
+		Write-Host -NoNewline "$inventoryWeight" -ForegroundColor $invWtColor
+		Write-Host -NoNewline "kg"
 		Write-Host " ] " -ForegroundColor Blue
 		
-        Write-Host -NoNewLine "[1] " -ForegroundColor Cyan
+        Write-Host -NoNewline "[1] " -ForegroundColor Cyan
 		Write-Host "Back" -ForegroundColor DarkGray
 
         $i = 2
         $keys = @($Inventory.Keys)
 
         foreach ($name in $keys) {
-            Write-Host -NoNewLine "[$i] " -ForegroundColor Cyan
-			Write-Host -NoNewLine "$name"
-			Write-Host -NoNewLine " x$($Inventory[$name].Quantity)" -ForegroundColor Cyan
-			Write-Host -NoNewLine " [ " -ForegroundColor Blue
+            Write-Host -NoNewline "[$i] " -ForegroundColor Cyan
+			Write-Host -NoNewline "$name"
+			Write-Host -NoNewline " x$($Inventory[$name].Quantity)" -ForegroundColor Cyan
+			Write-Host -NoNewline " [ " -ForegroundColor Blue
 			# Value
 			if ($Inventory[$name].Quantity -ge 2) { # Show value per/ea if quantity -ge 2
 				$itemTotalWorth = ($Inventory[$name].Quantity * $Inventory[$name].Value)
-				Write-Host -NoNewLine "Value:"
-				Write-Host -NoNewLine "$itemTotalWorth" -ForegroundColor Green
-				Write-Host -NoNewLine "CD ("
-				Write-Host -NoNewLine "$($Inventory[$name].Value)" -ForegroundColor Green
-				Write-Host -NoNewLine "CD/ea)"
-			} else { # Show value only if quantity -eq 1
-				Write-Host -NoNewLine "Value:"
+				Write-Host -NoNewline "Value:"
+				Write-Host -NoNewline "$itemTotalWorth" -ForegroundColor Green
+				Write-Host -NoNewline "CD ("
 				Write-Host -NoNewline "$($Inventory[$name].Value)" -ForegroundColor Green
-				Write-Host -NoNewLine "CD"
+				Write-Host -NoNewline "CD/ea)"
+			} else { # Show value only if quantity -eq 1
+				Write-Host -NoNewline "Value:"
+				Write-Host -NoNewline "$($Inventory[$name].Value)" -ForegroundColor Green
+				Write-Host -NoNewline "CD"
 			}
-			Write-Host -NoNewLine " | "-ForegroundColor Blue
+			Write-Host -NoNewline " | "-ForegroundColor Blue
 			# Weight 
+            $itemWtColor = Get-HPColor -value $inventoryWeight -UpBand 90 -UpBandColor "DarkRed" -MidBand 75 -MidBandColor "Red" -LowBand 50 -LowBandColor "Yellow" -EmptyBandColor "Green"
 			if ($Inventory[$name].Quantity -ge 2) { # Show weight per/ea if quantity -ge 2
 				$itemTotalWeight = ($Inventory[$name].Quantity * $Inventory[$name].Weight)
-				Write-Host -NoNewLine "WT:"
-				Write-Host -NoNewLine "$itemTotalWeight" -ForegroundColor (Get-HPColor -value $inventoryWeight -UpBand 90 -UpBandColor "DarkRed" -MidBand 75 -MidBandColor "Red" -LowBand 50 -LowBandColor "Yellow" -EmptyBandColor "Green") 
-				Write-Host -NoNewLine " ("
-				Write-Host -NoNewLine "$($Inventory[$name].weight)" -ForegroundColor (Get-HPColor -value $inventoryWeight -UpBand 90 -UpBandColor "DarkRed" -MidBand 75 -MidBandColor "Red" -LowBand 50 -LowBandColor "Yellow" -EmptyBandColor "Green") 
-				Write-Host -NoNewLine "kg/ea)"
+				Write-Host -NoNewline "WT:"
+				Write-Host -NoNewline "$itemTotalWeight" -ForegroundColor $itemWtColor
+				Write-Host -NoNewline " ("
+				Write-Host -NoNewline "$($Inventory[$name].weight)" -ForegroundColor $itemWtColor
+				Write-Host -NoNewline "kg/ea)"
 			} else { # Show weight only if quantity -eq 1
-				Write-Host -NoNewLine "WT:"
-				Write-Host -NoNewline "$($Inventory[$name].weight)" -ForegroundColor (Get-HPColor -value $inventoryWeight -UpBand 90 -UpBandColor "DarkRed" -MidBand 75 -MidBandColor "Red" -LowBand 50 -LowBandColor "Yellow" -EmptyBandColor "Green") 
-				Write-Host -NoNewLine "kg"
+				Write-Host -NoNewline "WT:"
+				Write-Host -NoNewline "$($Inventory[$name].weight)" -ForegroundColor $itemWtColor
+				Write-Host -NoNewline "kg"
 			}
 			Write-Host " ]" -ForegroundColor Blue
             $i++
@@ -595,7 +600,7 @@ function Show-Inventory { # INVENTORY MENU
 
                 if ($itemData.Consumable) {
 
-                    Write-Host -NoNewLine "[1] " -ForegroundColor Cyan
+                    Write-Host -NoNewline "[1] " -ForegroundColor Cyan
 					Write-Host "Back" -ForegroundColor DarkGray
                     Write-Host "[2] Use"
 
@@ -622,10 +627,19 @@ function Show-TraderMenu {
     while ($true) {
 
         Show-Header
-        Write-Host -NoNewLine "[1] " -ForegroundColor Cyan
+        Write-Host -NoNewline "[1] " -ForegroundColor Cyan
 		Write-Host "Back" -ForegroundColor DarkGray
         Write-Host "[2] Buy" -ForegroundColor Cyan
         Write-Host "[3] Sell" -ForegroundColor Cyan
+		
+        $planetData = $CurrentSolarSystem[$planetName]
+        $missingFuel = 100 - $Player.Fuel
+        $fuelPrice = [math]::Ceiling(($missingFuel * 0.5) * $planetData.FuelModifier)
+        $missingHP = 100 - $Player.HP
+        $repairPrice = [math]::Ceiling(($missingHP * 1.0) * $planetData.RepairModifier)
+        $fuelColor = if ($Player.Credits -ge $fuelPrice) { "Green" } else { "Red" }
+        $repairColor = if ($Player.Credits -ge $repairPrice) { "Green" } else { "Red" }
+
 		Write-Host -NoNewline "[4] Repair - " -ForegroundColor Cyan
 		Write-Host -NoNewline "$repairPrice" -ForegroundColor $repairColor
 		Write-Host "CD"
@@ -685,7 +699,7 @@ function Show-BuyMenu {
         Show-Header
         Write-Host "Trader Wealth: $($trader.Credits)"
         Write-Host ""
-        Write-Host -NoNewLine "[1] " -ForegroundColor Cyan
+        Write-Host -NoNewline "[1] " -ForegroundColor Cyan
 		Write-Host "Back" -ForegroundColor DarkGray
 
         $i = 2
@@ -775,13 +789,12 @@ function Show-SellMenu {
     while ($true) {
 
         Show-Header
-        Write-Host -NoNewLine "Trader Wealth: "
+        Write-Host -NoNewline "Trader Wealth: "
 		if ($trader.Credits -gt 3000) { Write-Host "$($trader.Credits)" -ForegroundColor Green } 
 		elseif ($trader.Credits -gt 1000) { Write-Host "$($trader.Credits)" -ForegroundColor Yellow }
 		else { Write-Host "$($trader.Credits)" -ForegroundColor Red }
-		#Write-Host "$($trader.Credits)"
 		
-        Write-Host -NoNewLine "[1] " -ForegroundColor Cyan
+        Write-Host -NoNewline "[1] " -ForegroundColor Cyan
 		Write-Host "Back" -ForegroundColor DarkGray
 
         $i = 2
@@ -820,10 +833,9 @@ function Show-SellMenu {
                 $selected = $items[$index - 2]
                 $item = $Inventory[$selected]
 
-                Write-Host -NoNewLine "[?] How many "
-				Write-Host -NoNewLine "$selected" -ForegroundColor $rarityColor
+                Write-Host -NoNewline "[?] How many "
+				Write-Host -NoNewline "$selected" -ForegroundColor $rarityColor
 				Write-Host "?"
-				#Write-Host ""
                 $qtyInput = Read-Host ">"
 
                 if ($qtyInput -match "^[aA]$") {
@@ -892,8 +904,63 @@ function Show-Death {
     Write-Host "Final Credits: $total" -ForegroundColor Yellow
     Write-Host ""
     Pause
-    Start-NewGame
+	Exit
 }
+
+function Show-DistressSignal {
+    Clear-Host
+    Write-Host ""
+    Write-Host "!!! EMERGENCY BEACON ACTIVATED !!!" -ForegroundColor DarkRed
+    Write-Host "Signal broadcast in progress... standby for recovery." -ForegroundColor Red
+    Write-Host ""
+    
+    $seconds = 10 # Reduced for testing/playability, set to 60 for tension
+    while ($seconds -gt 0) {
+        $blink = if ($seconds % 2 -eq 0) { " [ SIGNAL PULSE ] " } else { " (             ) " }
+        
+        Show-Header
+        Write-Host ""
+        Write-Host "        $blink" -ForegroundColor Cyan
+        Write-Host ""
+        Write-Host "   RESCUE ARRIVAL IN: $seconds SECONDS" -ForegroundColor Yellow
+        Write-Host ""
+        Write-Host "   !!! ALL RAW CARGO WILL BE FORFEIT !!!" -ForegroundColor DarkGray
+        Write-Host "   !!! 50% CREDIT SURCHARGE APPLIED  !!!" -ForegroundColor DarkGray
+        
+        Start-Sleep -Seconds 1
+        $seconds--
+    }
+
+    # Apply Penalties
+    $Player.Credits = [math]::Floor($Player.Credits / 2)
+    
+    $keys = @($Inventory.Keys)
+    foreach ($k in $keys) {
+        if (-not $Inventory[$k].Consumable) {
+            $Inventory.Remove($k)
+        }
+    }
+
+    $nearest = "Mars" 
+    $minDist = 999
+    $currentDist = $CurrentSolarSystem[$Player.Location].Distance
+
+    foreach ($key in $CurrentSolarSystem.Keys) {
+        if ($key -ne "_Metadata" -and $CurrentSolarSystem[$key].Inhabited) {
+            $dist = [math]::Abs($CurrentSolarSystem[$key].Distance - $currentDist)
+            if ($dist -lt $minDist) {
+                $minDist = $dist
+                $nearest = $key
+            }
+        }
+    }
+
+    $Player.Location = $nearest
+    $Player.Fuel = 10 
+    $Player.HP = 50   
+    $Player.Dialog = "You were towed to orbit by a Scrapper Union vessel. Don't make them come out again."
+}
+
 # -------------------------------
 # SOLAR MENU
 # -------------------------------
@@ -903,75 +970,113 @@ function Show-SolarSystem {
 
         Show-Header
 		
-		# Display Solar System Name Header using the string stored in Player.System
         if ($Player.System) {
             Write-Host "--- $($Player.System) ---" -ForegroundColor Green
         }
 		
-        Write-Host -NoNewLine "[1]  Return to " -ForegroundColor Cyan
+        Write-Host -NoNewline "[1]  Return to " -ForegroundColor Cyan
 		Write-Host -NoNewline "$($Player.Location)" -ForegroundColor (Get-HazardColor $($CurrentSolarSystem[$Player.Location].Hazard))
 		Write-Host " orbit" -ForegroundColor Cyan
 
         $currentDist = $CurrentSolarSystem[$Player.Location].Distance
 
-        # Filter out metadata and the current location for the jump list
         $planetList = $CurrentSolarSystem.Keys |
-            Where-Object { $_ -ne $Player.Location -and $_ -ne "_Metadata" } |
+            Where-Object { $_ -ne "_Metadata" } |
             ForEach-Object {
                 $data = $CurrentSolarSystem[$_]
-                $distanceAU = [math]::Abs($data.Distance - $currentDist)
+                $distFromPlayer = [math]::Abs($data.Distance - $currentDist)
                 [PSCustomObject]@{
-                    Name       = $_
-                    DistanceAU = $distanceAU
-                    Data       = $data
+                    Name           = $_
+                    DistFromSun    = $data.Distance
+                    DistFromPlayer = $distFromPlayer
+                    Data           = $data
                 }
             } |
-            Sort-Object DistanceAU
+            Sort-Object DistFromSun
 
         $i = 2
+        $canReachAnyOther = $false
 
 		$maxNameLength = ($planetList.Name | Measure-Object -Property Length -Maximum).Maximum
 		foreach ($entry in $planetList) {
 			$planet = $entry.Name
 			$data = $entry.Data
-			$distanceAU = [math]::Round($entry.DistanceAU, 2)
+			$distanceAU = [math]::Round($entry.DistFromPlayer, 2)
 			
-			# Format to XX.XX
 			$distanceText = "{0:00.00}" -f $distanceAU 
 			
 			$fuelCost = [math]::Ceiling($distanceAU / 0.1)
+            $fuelPercentCost = [math]::Min(100, $fuelCost) 
+            
+            $remainingFuel = $Player.Fuel - $fuelCost
+            
+            $isCurrent = ($planet -eq $Player.Location)
+            
+            # Fuel Color Coding Logic
+            $fuelStatusColor = "DarkRed" # Default
+            if ($isCurrent) {
+                $fuelStatusColor = "DarkGray"
+            }
+            elseif ($fuelCost -gt $Player.Fuel) {
+                $fuelStatusColor = "DarkRed"
+            }
+            else {
+                $canReachAnyOther = $true # You can reach a DIFFERENT planet
+                if ($remainingFuel -gt 50) { $fuelStatusColor = "Green" }
+                elseif ($remainingFuel -ge 26) { $fuelStatusColor = "Yellow" }
+                else { $fuelStatusColor = "Red" }
+            }
 
-			# ALIGNS BRACKETS based on digits in index
+            # PS5.1 Compatibility: Extract color logic to variables before Write-Host
+            $distColor = if ($isCurrent) { "DarkGray" } else { $fuelStatusColor }
+
 			$indexText = "[$i]".PadRight(5)
 			Write-Host -NoNewline $indexText -ForegroundColor Cyan
 			
-            # Pad name column width to longest planet name
 			$planetLabel = $planet.PadRight($maxNameLength)
 			Write-Host -NoNewline $planetLabel -ForegroundColor (Get-HazardColor $data.Hazard)
             Write-Host -NoNewline " | "
 
-            # Fuel coloring logic for Distance
-			$fuelColor = if ($fuelCost -le $Player.Fuel) { "Green" } else { "Red" }
-			Write-Host -NoNewline "$distanceText" -ForegroundColor $fuelColor ; Write-Host -NoNewline "AU | "
+			Write-Host -NoNewline "$distanceText" -ForegroundColor $distColor
+            Write-Host -NoNewline "AU ("
+            $fuelDisplay = "{0:000}" -f $fuelPercentCost
+            Write-Host -NoNewline "$fuelDisplay%" -ForegroundColor $distColor
+            Write-Host -NoNewline ") | "
 			
-			# Show Type
-			if ($data.Type -eq "Terrestrial") {Write-Host -NoNewLine "Terrestrial" -ForegroundColor DarkYellow} 
-			elseif ($data.Type -eq "Gas Giant") {Write-Host -NoNewLine "Gas Giant" -ForegroundColor Yellow}
-			elseif ($data.Type -eq "Ice Giant") {Write-Host -NoNewLine "Ice Giant" -ForegroundColor Cyan}
-			elseif ($data.Type -eq "Asteroid") {Write-Host -NoNewLine "Asteroid" -ForegroundColor DarkGray}
-			elseif ($data.Type -eq "Dwarf") {Write-Host -NoNewLine "Dwarf" -ForegroundColor DarkGray}
+			if ($data.Type -eq "Terrestrial") {Write-Host -NoNewline "Terrestrial" -ForegroundColor DarkYellow} 
+			elseif ($data.Type -eq "Gas Giant") {Write-Host -NoNewline "Gas Giant" -ForegroundColor Yellow}
+			elseif ($data.Type -eq "Ice Giant") {Write-Host -NoNewline "Ice Giant" -ForegroundColor Cyan}
+			elseif ($data.Type -eq "Asteroid") {Write-Host -NoNewline "Asteroid" -ForegroundColor DarkGray}
+			elseif ($data.Type -eq "Dwarf") {Write-Host -NoNewline "Dwarf" -ForegroundColor DarkGray}
 			else {
-				Write-Host -NoNewLine "Other" -ForegroundColor Magenta
+				Write-Host -NoNewline "Other" -ForegroundColor Magenta
 			}
+
+            if ($data.Inhabited) {
+                Write-Host -NoNewline " ($($data.TraderName))" -ForegroundColor $data.DialogColor
+            }
 
 			Write-Host " - $($data.Description)"
 
 			$i++
 		}
 
+        # Distress Signal logic: Only if you CANNOT reach any OTHER planet.
+        $distressIndex = -1
+        if (-not $canReachAnyOther) {
+            $distressIndex = $i
+            Write-Host -NoNewline "[$distressIndex] " -ForegroundColor Red
+            Write-Host "Send Distress Signal" -ForegroundColor DarkRed
+        }
+
         $choice = Read-Host ">"
 
         if ($choice -eq "1") { return }
+        
+        if ($distressIndex -ne -1 -and $choice -eq [string]$distressIndex) {
+            Show-DistressSignal
+            return
+        }
 
         if ($choice -match "^\d+$") {
 
@@ -981,7 +1086,10 @@ function Show-SolarSystem {
 
                 $selected = $planetList[$index - 2]
                 $target = $selected.Name
-                $distanceAU = $selected.DistanceAU
+                
+                if ($target -eq $Player.Location) { return }
+
+                $distanceAU = $selected.DistFromPlayer
                 $fuelCost = [math]::Ceiling($distanceAU / 0.1)
 
                 if ($fuelCost -le $Player.Fuel) {
@@ -1016,22 +1124,12 @@ function Show-OrbitMenu {
 
         Show-Header
 
-        Write-Host -NoNewLine "[1] Depart " -ForegroundColor Cyan
+        Write-Host -NoNewline "[1] Depart " -ForegroundColor Cyan
 		Write-Host $Player.Location -ForegroundColor (Get-HazardColor $planetData.Hazard)
         Write-Host "[2] Inventory" -ForegroundColor Cyan
         Write-Host "[3] Prospect" -ForegroundColor Cyan
 
         if ($planetData.Inhabited) {
-
-            $missingFuel = 100 - $Player.Fuel
-            $fuelPrice = [math]::Ceiling(($missingFuel * 0.5) * $planetData.FuelModifier)
-
-            $missingHP = 100 - $Player.HP
-            $repairPrice = [math]::Ceiling(($missingHP * 1.0) * $planetData.RepairModifier)
-
-            $fuelColor = if ($Player.Credits -ge $fuelPrice) { "Green" } else { "Red" }
-            $repairColor = if ($Player.Credits -ge $repairPrice) { "Green" } else { "Red" }
-
 			Write-Host "[4] Trade" -ForegroundColor Cyan
         }
 
@@ -1041,8 +1139,7 @@ function Show-OrbitMenu {
             "1" { Show-SolarSystem }
             "2" { Show-Inventory }
             "3" { Prospect }
-			"4" { Show-TraderMenu }
-            
+			"4" { if ($planetData.Inhabited) { Show-TraderMenu } }
         }
     }
 }
@@ -1051,7 +1148,4 @@ function Show-OrbitMenu {
 #region ##### DO IT #####
 Start-NewGame
 Show-OrbitMenu
-#enregion
-
-# CHANGELOG
-# ... Too early! 
+#endregion
