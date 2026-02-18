@@ -9,14 +9,16 @@ function Start-NewGame {
     $global:Player = @{
         Credits    = 1000
         HP         = 100
-        Fuel       = 100
-        MaxFuel    = 100
+        Fuel       = 300
+        MaxFuel    = 300
 		MaxWeight  = 100
 		System	   = $null
         Location   = "Mars"
         Dialog     = $null
 		Message	   = $null
-		PlanetColor = $null
+		Hyperdrive = $null # Unlocked by acquiring HyperDrive upgrade; allows for inter-galactic travel
+		ProsGas	   = $null # Unlocked by acquiring Gas Giant Prospecting Drill; allows for prospecting Gas Giants
+		ProsIce    = $null # Unlocked by acquiring Ice Giant Prospecting Drill; allows for prospecting Ice Giants
     }
 
     $global:Inventory = @{
@@ -66,7 +68,7 @@ function Start-NewGame {
 
         # --- Upgrades ---
         "Cargo Baffles"    				= @{ Value = 500; Weight = 0; Rarity = "Upgrade";     Description = "Optimized storage racks. +25 Max Weight"; Consumable = $true; Effect = "MaxWeight"; EffectValue = 25 }
-		"Auxiliary Fuel Tank"  			= @{ Value = 300; Weight = 0; Rarity = "Upgrade";     Description = "Additional fuel capacity. +100 Max Fuel"; Consumable = $true; Effect = "MaxFuel"; EffectValue = 100 }
+		"Auxiliary Fuel Tank"  			= @{ Value = 300; Weight = 0; Rarity = "Upgrade";     Description = "Additional fuel capacity. +100 Max Fuel"; Consumable = $true; Effect = "MaxFuel"; EffectValue = 300 }
 		"U.C.E. Shield Generator MK I"  = @{ Value = 250; Weight = 0; Rarity = "Upgrade";     Description = "Increased shield capacity. +25 Max HP"; Consumable = $true; Effect = "HP"; EffectValue = 25 }
 		"U.C.E. Shield Generator MK II" = @{ Value = 500; Weight = 0; Rarity = "Upgrade";     Description = "Increased shield capacity. +50 Max HP"; Consumable = $true; Effect = "HP"; EffectValue = 50 }
 		"U.C.E. Shield Generator MK III"= @{ Value = 750; Weight = 0; Rarity = "Upgrade";     Description = "Increased shield capacity. +75 Max HP"; Consumable = $true; Effect = "HP"; EffectValue = 75 }
@@ -88,15 +90,16 @@ function Start-NewGame {
 
 	$global:SolSystem = @{
 		_Metadata = @{ Name = "The Sol System" }
+		# Terrestrial
 		Mercury  = @{ 
 			Distance    = 0.4; Inhabited = $false; Type = "Terrestrial"; Hazard = 70
-			Description = "Mostly magma." ; PlanetColor="Red"
+			Description = "Mostly magma." ; PlanetColor="DarkYellow"
 			Resources   = @{ "Iron" = 30; "Nickel" = 20; "Silicates" = 20; "Sulfur" = 15; "Gold" = 10; "Copper" = 5 }
 			HazardReasons = @("Solar flare radiation", "Tidal heating quake", "Magma spray")
 		}
 		Venus    = @{ 
-			Distance    = 0.7; Inhabited = $false; Type = "Terrestrial"; Hazard = 90
-			Description = "Bright." ; PlanetColor="Yellow"
+			Distance    = 0.7; Inhabited = $false; Type = "Terrestrial"; Hazard = 80
+			Description = "Very bright." ; PlanetColor="Yellow"
 			Resources   = @{ "SulfuricAcid" = 45; "Nitrogen" = 20; "Sulfur" = 20; "Nickel" = 10 ; "Gold" = 1; "Silver" = 4}
 			HazardReasons = @("Acid rain corrosion", "Atmospheric pressure spike", "Super-rotation turbulence")
 		}
@@ -148,10 +151,11 @@ function Start-NewGame {
 		}
 		Ceres    = @{ 
 			Distance    = 2.8; Inhabited = $false; Type = "Asteroid";    Hazard = 5
-			Description = "Abandoned." ; PlanetColor="Gray"
-			Resources   = @{ "Water" = 38; "Iron" = 30; "Silicates" = 20; "Nickel" = 10 ; "Gold" = 1 ; "Silver" = 1 }
+			Description = "An abandoned rock." ; PlanetColor="Gray"
+			Resources   = @{ "Water" = 35; "Iron" = 30; "Silicates" = 20; "Nickel" = 10 ; "Gold" = 1 ; "Silver" = 4 }
 			HazardReasons = @("Micro-asteroid impact", "Electrostatic discharge")
 		}
+		# Jovian
 		Jupiter  = @{ 
 			Distance    = 5.2; Inhabited = $false; Type = "Gas Giant";   Hazard = 95
 			Description = "Vast and hostile." ; PlanetColor="Red"
@@ -160,43 +164,43 @@ function Start-NewGame {
 		}
 		Saturn   = @{ 
 			Distance    = 9.5; Inhabited = $false; Type = "Gas Giant";   Hazard = 85
-			Description = "The ringed jewel." ; PlanetColor="DarkGreen"
+			Description = "The ringed behemoth." ; PlanetColor="Yellow"
 			Resources   = @{ "Hydrogen" = 50; "Water" = 20; "Helium" = 15; "ScrapMetal" = 10; "Silicates" = 5 }
 			HazardReasons = @("Ring shard impact", "Extreme lightning discharge")
 		}
 		Uranus   = @{ 
 			Distance    = 19.2; Inhabited = $false; Type = "Ice Giant";   Hazard = 50
-			Description = "The tilted giant." ; PlanetColor="Cyan"
+			Description = "The tilted giant." ; PlanetColor="DarkCyan"
 			Resources   = @{ "Hydrogen" = 40; "Water" = 30; "Nitrogen" = 20; "Uranium" = 10 }
 			HazardReasons = @("Extreme cold stress", "Methane pressure spike")
 		}
 		Neptune  = @{ 
 			Distance    = 30.1; Inhabited = $false; Type = "Ice Giant";   Hazard = 55
-			Description = "Windswept blue."  ; PlanetColor="Blue"
+			Description = "Deep blue."  ; PlanetColor="Blue"
 			Resources   = @{ "Hydrogen" = 50; "SulfuricAcid" = 20; "Nitrogen" = 20; "Water" = 10 }
 			HazardReasons = @("Supersonic wind shear", "Freezing pressure")
 		}
 		Pluto    = @{ 
 			Distance    = 39.5; Inhabited = $false; Type = "Dwarf";       Hazard = 20
-			Description = "The icy underdog." ; PlanetColor="DarkGray"
+			Description = "The icy underdog." ; PlanetColor="White"
 			Resources   = @{ "Water" = 40; "Nitrogen" = 30; "Biomass" = 20; "Fossils" = 10 }
 			HazardReasons = @("Nitrogen ice shift", "Cryo-geyser eruption")
 		}
 		Haumea   = @{ 
 			Distance    = 43.2; Inhabited = $false; Type = "Dwarf";       Hazard = 15
-			Description = "The spinning egg." ; PlanetColor="DarkGray"
+			Description = "Hi'iaka & Namaka" ; PlanetColor="Gray"
 			Resources   = @{ "Silicates" = 70; "ScrapMetal" = 20; "Iron" = 10 }
 			HazardReasons = @("Centrifugal debris impact")
 		}
 		Makemake = @{ 
 			Distance    = 45.5; Inhabited = $false; Type = "Dwarf";       Hazard = 15
-			Description = "Reddish and cold." ; PlanetColor="DarkGray"
+			Description = "Red and cold." ; PlanetColor="Gray"
 			Resources   = @{ "Nitrogen" = 60; "Hydrogen" = 20; "Water" = 15; "Silicates" = 5 }
 			HazardReasons = @("Sublimation collapse")
 		}
 		Eris     = @{ 
 			Distance    = 67.8; Inhabited = $false; Type = "Dwarf";       Hazard = 40
-			Description = "Far-out..." ; PlanetColor="DarkGray"
+			Description = "Far-out..." ; PlanetColor="Gray"
 			Resources   = @{ "MetallicHydrogen" = 40; "ScrapMetal" = 40; "Biomass" = 20 }
 			HazardReasons = @("Interstellar radiation burst")
 		}
@@ -267,7 +271,7 @@ function Get-HazardColor($Value) {
     if ($Value -ge 85) { "DarkRed" }
     elseif ($Value -ge 66) { "Red" }
     elseif ($Value -ge 33) { "Yellow" }
-    elseif ($Value -eq 1 ) { "Cyan" }
+    elseif ($Value -eq 1 ) { "DarkCyan" }
     else { "Green" }
 }
 
@@ -291,6 +295,7 @@ function Prospect {
     $startTime = Get-Date
     $lastYieldTime = Get-Date
     $sessionLog = New-Object System.Collections.Generic.List[PSObject]
+	$maxVisibleLines = 16
     
     while ($true) {
         Show-Header -Prospecting
@@ -307,11 +312,21 @@ function Prospect {
         Write-Host $planetData.Hazard -ForegroundColor (Get-HazardColor $planetData.Hazard)
         Write-Host ""
 
-        for ($i = 0; $i -lt 16; $i++) {
-            if ($i -lt $sessionLog.Count) { Write-Host "   $($sessionLog[$i].Text)" -ForegroundColor $sessionLog[$i].Color } 
+		 # Log Display Logic with Scroll Indicator
+        for ($i = 0; $i -lt $maxVisibleLines; $i++) {
+            if ($i -lt $sessionLog.Count) { 
+                Write-Host "   $($sessionLog[$i].Text)" -ForegroundColor $sessionLog[$i].Color 
+            } 
             else { Write-Host "" }
         }
 
+        if ($sessionLog.Count -gt $maxVisibleLines) {
+            $hiddenCount = $sessionLog.Count - $maxVisibleLines
+            Write-Host "   ($hiddenCount more...)" -ForegroundColor DarkGray
+        } else {
+            Write-Host ""
+        }
+		
         Write-Host ""
         Write-Host -NoNewLine "   Prospecting for: "
 		Write-Host "$($elapsed.ToString('mm\:ss'))" -ForegroundColor Cyan
@@ -319,7 +334,7 @@ function Prospect {
 		Write-Host -NoNewLine "[ANY KEY]" -ForegroundColor DarkCyan
 		Write-Host " to stop prospecting..."
 
-        if (((Get-Date) - $lastYieldTime).TotalSeconds -ge 4) {
+        if (((Get-Date) - $lastYieldTime).TotalSeconds -ge 2) {
             $lastYieldTime = Get-Date
             if ($Player.Fuel -gt 0) {
                 if ((Get-CurrentWeight) -lt $Player.MaxWeight) {
@@ -680,9 +695,11 @@ function Show-DistressSignal {
         $blink = if ($seconds % 2 -eq 0) { " [ SIGNAL PULSE ] " } else { " (             ) " }
         Show-Header
         Write-Host ""
-        Write-Host "        $blink" -ForegroundColor Cyan
+        Write-Host "        $blink" -ForegroundColor DarkRed
         Write-Host ""
-        Write-Host "   RESCUE ARRIVAL IN: $seconds SECONDS" -ForegroundColor Yellow
+        Write-Host -NoNewline "   RESCUE ARRIVAL IN: " -ForegroundColor DarkYellow
+		Write-Host -NoNewline "$seconds" -ForegroundColor Yellow
+		Write-Host " SECONDS" -ForegroundColor DarkYellow
         Write-Host ""
         Write-Host "   !!! ALL RAW CARGO WILL BE FORFEIT !!!" -ForegroundColor DarkGray
         Write-Host "   !!! 50% CREDIT SURCHARGE APPLIED  !!!" -ForegroundColor DarkGray
@@ -708,13 +725,15 @@ function Show-SolarSystem {
         Show-Header
         if ($Player.System) { Write-Host "--- $($Player.System) ---" -ForegroundColor Green }
         Write-Host -NoNewline "[1]  Return to " -ForegroundColor Cyan
-		Write-Host -NoNewline "$($Player.Location)" -ForegroundColor (Get-HazardColor $($CurrentSolarSystem[$Player.Location].Hazard))
+		Write-Host -NoNewline "$($Player.Location)" -ForegroundColor ($CurrentSolarSystem[$Player.Location].PlanetColor)
 		Write-Host " orbit" -ForegroundColor Cyan
+        
         $currentDist = $CurrentSolarSystem[$Player.Location].Distance
         $planetList = $CurrentSolarSystem.Keys | Where-Object { $_ -ne "_Metadata" } | ForEach-Object {
                 $data = $CurrentSolarSystem[$_]
                 [PSCustomObject]@{ Name = $_; DistFromSun = $data.Distance; DistFromPlayer = [math]::Abs($data.Distance - $currentDist); Data = $data }
             } | Sort-Object DistFromSun
+
         $i = 2; $canReachAnyOther = $false
 		$maxNameLength = ($planetList.Name | Measure-Object -Property Length -Maximum).Maximum
 		foreach ($entry in $planetList) {
@@ -722,37 +741,53 @@ function Show-SolarSystem {
 			$fuelCost = [math]::Ceiling($distanceAU / 0.1)
             $remainingFuel = $Player.Fuel - $fuelCost
             $isCurrent = ($planet -eq $Player.Location)
-            $fuelStatusColor = "DarkRed"
-            if ($isCurrent) { $fuelStatusColor = "DarkGray" }
-            elseif ($fuelCost -gt $Player.Fuel) { $fuelStatusColor = "DarkRed" }
-            else {
-                $canReachAnyOther = $true
-                $remPct = ($remainingFuel / $Player.MaxFuel) * 100
-                if ($remPct -gt 50) { $fuelStatusColor = "Green" }
-                elseif ($remPct -ge 26) { $fuelStatusColor = "Yellow" }
-                else { $fuelStatusColor = "Red" }
+            $fuelStatusColor = "DarkGray"
+            
+            if (-not $isCurrent) {
+                if ($fuelCost -gt $Player.Fuel) { $fuelStatusColor = "DarkRed" }
+                else {
+                    $canReachAnyOther = $true
+                    $remPct = ($remainingFuel / $Player.MaxFuel) * 100
+                    if ($remPct -gt 50) { $fuelStatusColor = "Green" }
+                    elseif ($remPct -ge 26) { $fuelStatusColor = "Yellow" }
+                    else { $fuelStatusColor = "Red" }
+                }
             }
-            $distColor = if ($isCurrent) { "DarkGray" } else { $fuelStatusColor }
+
 			Write-Host -NoNewline ("[" + $i + "]").PadRight(5) -ForegroundColor Cyan
-			Write-Host -NoNewline $planet.PadRight($maxNameLength) -ForegroundColor (Get-HazardColor $data.Hazard)
-            Write-Host -NoNewline " | "
-			Write-Host -NoNewline ("{0:00.00}" -f $distanceAU) -ForegroundColor $distColor
+			# Planet Name in its PlanetColor
+            Write-Host -NoNewline $planet.PadRight($maxNameLength + 1) -ForegroundColor ($data.PlanetColor)
+            
+            # Hazard Rating
+            Write-Host -NoNewline "("
+            Write-Host -NoNewline "$($data.Hazard) HZ" -ForegroundColor (Get-HazardColor $data.Hazard)
+			if ($data.Hazard -ge 100) { Write-Host -NoNewline ")".PadRight(1) }
+			elseif ($data.Hazard -ge 10) { Write-Host -NoNewline ")".PadRight(2) }
+			else { Write-Host -NoNewline ")".PadRight(3) }
+            
+            # Distance Info
+            Write-Host -NoNewline "| DIST "
+			Write-Host -NoNewline ("{0:00.00}" -f $entry.DistFromPlayer) -ForegroundColor $fuelStatusColor
             Write-Host -NoNewline "AU ("
-			Write-Host -NoNewline ("{0:000}" -f $fuelCost + " FL") -ForegroundColor $distColor
+			Write-Host -NoNewline ("{0:000}" -f $fuelCost + " FL") -ForegroundColor $fuelStatusColor
             Write-Host -NoNewline ") | "
+            
+            # Type and Description
 			$typeCol = switch($data.Type){ "Terrestrial"{"DarkYellow"};"Gas Giant"{"Yellow"};"Ice Giant"{"Cyan"};"Asteroid"{"DarkGray"};"Dwarf"{"DarkGray"};default{"Magenta"} }
             Write-Host -NoNewline $data.Type -ForegroundColor $typeCol
-            if ($data.Inhabited) { Write-Host -NoNewline " ($($data.TraderName))" -ForegroundColor $data.PlanetColor }
-			Write-Host " - $($data.Description)"
+			Write-Host -NoNewLine " - $($data.Description)"
+			if ($data.Inhabited) { Write-Host -NoNewline " ($($data.TraderName))" -ForegroundColor $data.PlanetColor }
+			Write-Host ""
 			$i++
 		}
+        
         $distressIndex = -1
         if (-not $canReachAnyOther) {
             $distressIndex = $i
-            Write-Host ""
             Write-Host -NoNewline "[$distressIndex] " -ForegroundColor Red
             Write-Host "Send Distress Signal" -ForegroundColor DarkRed
         }
+        
         $choice = Read-Host ">"
         if ($choice -eq "1") { return }
         if ($distressIndex -ne -1 -and $choice -eq [string]$distressIndex) { Show-DistressSignal; return }
