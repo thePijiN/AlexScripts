@@ -334,21 +334,49 @@ function Prospect {
 		Write-Host -NoNewLine "[ANY KEY]" -ForegroundColor DarkCyan
 		Write-Host " to stop prospecting..."
 
-        if (((Get-Date) - $lastYieldTime).TotalSeconds -ge 2) {
-            $lastYieldTime = Get-Date
-            if ($Player.Fuel -gt 0) {
-                if ((Get-CurrentWeight) -lt $Player.MaxWeight) {
-                    $resKeys = @($planetData.Resources.Keys)
-                    $resName = $resKeys | Get-Random
-                    if ($Inventory.ContainsKey($resName)) { $Inventory[$resName]++ } else { $Inventory[$resName] = 1 }
-                    $sessionLog.Insert(0, @{ Text = "+1 $resName"; Color = (Get-RarityColor $ResourceMaster[$resName].Rarity) })
-                    $Player.Fuel = [math]::Max(0, $Player.Fuel - 1)
-                } else {
-                    $player.Message = "Cargo hull is full!"
-                    break
-                }
-            } else { break }
-        }
+		if (((Get-Date) - $lastYieldTime).TotalSeconds -ge 2) {
+			$lastYieldTime = Get-Date
+
+			if ($Player.Fuel -gt 0) {
+				if ((Get-CurrentWeight) -lt $Player.MaxWeight) {
+					# ----- Weighted Resource Roll -----
+					$totalWeight = 0
+					foreach ($value in $planetData.Resources.Values) {
+						$totalWeight += $value
+					}
+					$roll = Get-Random -Minimum 1 -Maximum ($totalWeight + 1)
+
+					$cumulative = 0
+					$resName = $null
+					foreach ($kvp in $planetData.Resources.GetEnumerator()) {
+						$cumulative += $kvp.Value
+						if ($roll -le $cumulative) {
+							$resName = $kvp.Key
+							break
+						}
+					}
+					# ----------------------------------
+					if ($Inventory.ContainsKey($resName)) {
+						$Inventory[$resName]++
+					}
+					else {
+						$Inventory[$resName] = 1
+					}
+					$sessionLog.Insert(0, @{
+						Text  = "+1 $resName"
+						Color = (Get-RarityColor $ResourceMaster[$resName].Rarity)
+					})
+					$Player.Fuel = [math]::Max(0, $Player.Fuel - 1)
+				}
+				else {
+					$player.Message = "Cargo hull is full!"
+					break
+				}
+			}
+			else {
+				break
+			}
+		}
 
 		$maxDmg=[int]($planetData.Hazard / 2)
 		if ($maxDmg -lt 1) { $maxDmg = 1 }
@@ -852,3 +880,4 @@ while ($true) {
 # New factions arent listed on Solar Menu until found.
 # Quest mechanics (accepting/managing/completing) for unique rewards.
 # Require GasGiant and IceGiant prospecting drill upgrades before they can be prospected. 
+
