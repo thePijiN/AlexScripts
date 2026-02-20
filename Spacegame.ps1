@@ -583,7 +583,7 @@ function Show-Inventory {
             Write-Host -NoNewline ($item.Name.PadRight(15)) -ForegroundColor (Get-RarityColor $item.Master.Rarity)
 			$desc = $item.Master.Description
             if ($item.Master.Effect) { Write-Host -NoNewline " | $desc"; Write-Host -NoNewline " (";Write-Host -NoNewline "$($item.Master.Rarity)" -ForegroundColor (Get-RarityColor $item.Master.Rarity); Write-Host ": +$($item.Master.EffectValue) $($item.Master.Effect))" }
-			else { Write-Host -NoNewline " | $desc"; Write-Host -NoNewline "(";Write-Host -NoNewline "$($item.Master.Rarity)" -ForegroundColor (Get-RarityColor $item.Master.Rarity);Write-Host")"} 
+			else { Write-Host -NoNewline " | $desc"; Write-Host -NoNewline "(";Write-Host -NoNewline "$($item.Master.Rarity)" -ForegroundColor (Get-RarityColor $item.Master.Rarity);Write-Host ")"} 
             $i++
         }
         
@@ -1040,3 +1040,4 @@ while ($true) {
 # New factions arent listed on Solar Menu until found.
 # Quest mechanics (accepting/managing/completing) for unique rewards.
 # Require GasGiant and IceGiant prospecting drill upgrades before they can be prospected. 
+
