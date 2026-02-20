@@ -1,5 +1,5 @@
 Clear-Host
-
+$SpacegameVersion = "0.0.1"
 # region ##### GAME INITIALIZER #####
 function Start-NewGame {
     # Set the global start time for the survival clock
@@ -7,8 +7,9 @@ function Start-NewGame {
 
 ##### PLAYER #####
     $global:Player = @{
-        Credits    = 1000
+        Credits    = 500
         HP         = 100
+		MaxHP	   = 100
         Fuel       = 300
         MaxFuel    = 300
 		MaxWeight  = 100
@@ -36,8 +37,8 @@ function Start-NewGame {
 		# Debug 
 		"HeavyObject"      = @{ Value = 1000;Weight = 999; Rarity = "SuperRare"; Description = "Shit's heavy."; Consumable = $false }
         # Metals
-		"ScrapMetal"       = @{ Value = 25;  Weight = 2; Rarity = "Common";      Description = "Salvaged hull plating."; Consumable = $false }
 		"Iron"             = @{ Value = 10;  Weight = 1; Rarity = "SuperCommon"; Description = "Raw Iron ore."; Consumable = $false }
+		"ScrapMetal"       = @{ Value = 25;  Weight = 2; Rarity = "Common";      Description = "Salvaged hull plating."; Consumable = $false }
 		"Copper"           = @{ Value = 30;  Weight = 1; Rarity = "Common";      Description = "Raw Copper ore."; Consumable = $false }
 		"Nickel"           = @{ Value = 40;  Weight = 1; Rarity = "Common"; 	 Description = "Raw Nickel ore."; Consumable = $false }
 		"Silver"           = @{ Value = 10;  Weight = 1; Rarity = "Rare"; 	 	 Description = "Raw Silver ore."; Consumable = $false }
@@ -50,32 +51,34 @@ function Start-NewGame {
 		# Gases
 		"Nitrogen"         = @{ Value = 12;  Weight = 1; Rarity = "Common";      Description = "Compressed nitrogen canisters."; Consumable = $false }
         "Hydrogen"         = @{ Value = 14;  Weight = 1; Rarity = "Common";      Description = "Hydrogen gas cylinders."; Consumable = $false }
-		"Helium"           = @{ Value = 30;  Weight = 1; Rarity = "Rare";      	 Description = "Hydrogen gas cylinders."; Consumable = $false }
+		"Helium"           = @{ Value = 30;  Weight = 1; Rarity = "Rare";      	 Description = "Helium gas cylinders."; Consumable = $false }
 		# Biological materials
         "Water"            = @{ Value = 10;  Weight = 1; Rarity = "SuperCommon"; Description = "Frozen H2O blocks."; Consumable = $false }
         "Biomass"          = @{ Value = 30;  Weight = 1; Rarity = "Rare";        Description = "Organic matter samples."; Consumable = $false }
 		# Rarities / Artifiacts
-		"MetallicHydrogen" = @{ Value = 200; Weight = 3; Rarity = "SuperRare";   Description = "Highly pressurized fuel precursor."; Consumable = $false }
-		"Fossils"		   = @{ Value = 1000; Weight = 2; Rarity = "SuperRare";  Description = "Unknown fossilzed alien lifeform."; Consumable = $false }
+		"MetallicHydrogen" = @{ Value = 250; Weight = 3; Rarity = "SuperRare";   Description = "Highly pressurized fuel precursor."; Consumable = $false }
+		"Fossils"		   = @{ Value = 300; Weight = 1; Rarity = "SuperRare";  Description = "Unknown fossilzed alien lifeform."; Consumable = $false }
 
         # --- Consumables ---
-        "Fuel Cell (Small)" 	= @{ Value = 35;  Weight = 3; Rarity = "Consumable";  Consumable = $true; Effect = "Fuel"; EffectValue = 25 ; Description = "Standard emergency fuel cell. +25% fuel";  UseMessage = "+25% Fuel administered" }
-		"Fuel Cell (Medium)"	= @{ Value = 75;  Weight = 4; Rarity = "Consumable";  Consumable = $true; Effect = "Fuel"; EffectValue = 50 ; Description = "Standard emergency fuel cell. +50% fuel";  UseMessage = "+50% Fuel administered" }
-		"Fuel Cell (Large)"		= @{ Value = 100; Weight = 5; Rarity = "Consumable";  Consumable = $true; Effect = "Fuel"; EffectValue = 75 ; Description = "Standard emergency fuel cell. +75% fuel";  UseMessage = "+75% Fuel administered" }
-        "Shield Cell (Small)"   = @{ Value = 50;  Weight = 3; Rarity = "Consumable";  Consumable = $true; Effect = "HP"; EffectValue = 25 ; Description = "Emergency shield restoration unit. +25% HP"; UseMessage = "+25% HP Restored" }
-		"Shield Cell (Medium)"  = @{ Value = 100; Weight = 4; Rarity = "Consumable";  Consumable = $true; Effect = "HP"; EffectValue = 50 ; Description = "Emergency shield restoration unit. +50% HP"; UseMessage = "+50% HP Restored" }
-        "Shield Cell (Large)"   = @{ Value = 150; Weight = 5; Rarity = "Consumable";  Consumable = $true; Effect = "HP"; EffectValue = 75 ; Description = "Emergency shield restoration unit. +75% HP"; UseMessage = "+75% HP Restored" }
+        "Fuel Cell (Small)" 	= @{ Value = 35;  Weight = 3; Rarity = "Consumable";  Consumable = $true; Effect = "Fuel"; EffectValue = 25 ; Description = "A small emergency fuel cell.";  UseMessage = "+25% Fuel administered" }
+		"Fuel Cell (Medium)"	= @{ Value = 75;  Weight = 4; Rarity = "Consumable";  Consumable = $true; Effect = "Fuel"; EffectValue = 50 ; Description = "A medium emergency fuel cell.";  UseMessage = "+50% Fuel administered" }
+		"Fuel Cell (Large)"		= @{ Value = 100; Weight = 5; Rarity = "Consumable";  Consumable = $true; Effect = "Fuel"; EffectValue = 75 ; Description = "A large emergency fuel cell.";  UseMessage = "+75% Fuel administered" }
+        "Shield Cell (Small)"   = @{ Value = 50;  Weight = 3; Rarity = "Consumable";  Consumable = $true; Effect = "HP"; EffectValue = 25 ; Description = "A small emergency shield restoration unit."; UseMessage = "+25% HP Restored" }
+		"Shield Cell (Medium)"  = @{ Value = 100; Weight = 4; Rarity = "Consumable";  Consumable = $true; Effect = "HP"; EffectValue = 50 ; Description = "A medium emergency shield restoration unit."; UseMessage = "+50% HP Restored" }
+        "Shield Cell (Large)"   = @{ Value = 150; Weight = 5; Rarity = "Consumable";  Consumable = $true; Effect = "HP"; EffectValue = 100 ; Description = "A large emergency shield restoration unit."; UseMessage = "+100% HP Restored" }
 
         # --- Upgrades ---
-        "Cargo Baffles"    				= @{ Value = 500; Weight = 0; Rarity = "Upgrade";     Description = "Optimized storage racks. +25 Max Weight"; Consumable = $true; Effect = "MaxWeight"; EffectValue = 25 }
-		"Auxiliary Fuel Tank"  			= @{ Value = 300; Weight = 0; Rarity = "Upgrade";     Description = "Additional fuel capacity. +100 Max Fuel"; Consumable = $true; Effect = "MaxFuel"; EffectValue = 300 }
-		"U.C.E. Shield Generator MK I"  = @{ Value = 250; Weight = 0; Rarity = "Upgrade";     Description = "Increased shield capacity. +25 Max HP"; Consumable = $true; Effect = "HP"; EffectValue = 25 }
-		"U.C.E. Shield Generator MK II" = @{ Value = 500; Weight = 0; Rarity = "Upgrade";     Description = "Increased shield capacity. +50 Max HP"; Consumable = $true; Effect = "HP"; EffectValue = 50 }
-		"U.C.E. Shield Generator MK III"= @{ Value = 750; Weight = 0; Rarity = "Upgrade";     Description = "Increased shield capacity. +75 Max HP"; Consumable = $true; Effect = "HP"; EffectValue = 75 }
-		"U.C.E. Shield Generator MK IV" = @{ Value = 1000; Weight = 0; Rarity = "Upgrade";     Description = "Increased shield capacity. +100 Max HP"; Consumable = $true; Effect = "HP"; EffectValue = 100 }
-		"U.C.E. Shield Generator MK V"  = @{ Value = 2000; Weight = 0; Rarity = "Upgrade";     Description = "Increased shield capacity. +200 Max HP"; Consumable = $true; Effect = "HP"; EffectValue = 200 }
-		# Gas Giant Drill
-		# Ice Giant Drill 
+		# Stat Boosters
+        "Cargo Baffles"    				= @{ Value = 500; Weight = 0; Rarity = "Upgrade";     Description = "Optimized storage racks."; Consumable = $true; Effect = "MaxWeight"; EffectValue = 25 }
+		"Auxiliary Fuel Tank"  			= @{ Value = 500; Weight = 0; Rarity = "Upgrade";     Description = "Additional fuel capacity."; Consumable = $true; Effect = "MaxFuel"; EffectValue = 100 }
+		"U.C.E. Shield Generator MK I"  = @{ Value = 250; Weight = 0; Rarity = "Upgrade";     Description = "Increased shield capacity."; Consumable = $true; Effect = "MaxHP"; EffectValue = 25 }
+		"U.C.E. Shield Generator MK II" = @{ Value = 500; Weight = 0; Rarity = "Upgrade";     Description = "Increased shield capacity."; Consumable = $true; Effect = "MaxHP"; EffectValue = 50 }
+		"U.C.E. Shield Generator MK III"= @{ Value = 750; Weight = 0; Rarity = "Upgrade";     Description = "Increased shield capacity."; Consumable = $true; Effect = "MaxHP"; EffectValue = 75 }
+		"U.C.E. Shield Generator MK IV" = @{ Value = 1000; Weight = 0; Rarity = "Upgrade";    Description = "Increased shield capacity."; Consumable = $true; Effect = "MaxHP"; EffectValue = 100 }
+		"U.C.E. Shield Generator MK V"  = @{ Value = 2000; Weight = 0; Rarity = "Upgrade";    Description = "Increased shield capacity."; Consumable = $true; Effect = "MaxHP"; EffectValue = 200 }
+		# Gadgets
+		#  -Gas Giant Drill
+		#  -Ice Giant Drill 
 	}
 
     # Define rarity order for sorting logic
@@ -110,7 +113,7 @@ function Start-NewGame {
 			HazardReasons = @("Hull stress", "Landslide", "Inclement weather", "Earthquake")
 			TraderName="U.C.E.O.C.S."; TotalTraderCredits=5000; FuelModifier=1.2; RepairModifier=2.0; PlanetColor="Green"
 			Dialog=@{
-				Greeting="Welcome to the United Countries of Earth orbital commerce services..."
+				Greeting="Welcome to the United Countries of Earth orbital commerce services..."; TradeGreeting="How may I assist you today..."
 				Refuel="Tanks topped."; Repair="Structural integrity restored."; Trade="Credits transfered."
 				InsufficientFunds="Transaction denied."; InsufficientFundsTrader="You've surpassed your credit-limit. Try again later."
 				Frustrated="What? No."
@@ -133,7 +136,7 @@ function Start-NewGame {
 			HazardReasons = @("Hull stress", "Dust storm")
 			TraderName="Mars Colony"; TotalTraderCredits=3000; FuelModifier=1.0; RepairModifier=1.0; PlanetColor="DarkRed"
 			Dialog=@{
-				Greeting="Welcome back, scrapper. What'll it be this time?"
+				Greeting="Welcome back, scrapper."; TradeGreeting="What'll it be this time?"
 				Refuel="Fuel's pumpin'."; Repair="Hull patched."; Trade="Pleasure doin' business."
 				InsufficientFunds="Credits first, hero."; InsufficientFundsTrader="And what'll ya be wanting for that?."
 				Frustrated="Come again, now?"
@@ -258,6 +261,30 @@ function Get-SurvivedTime {
     return "{0}s" -f $s
 }
 
+function Get-PercentColor {
+    param(
+        [double]$Current, 
+        [double]$Max, 
+        [switch]$Inverted # If true, high percentage = Red (useful for Weight/Hazard)
+    )
+    if ($Max -le 0) { return "White" }
+    $pct = ($Current / $Max) * 100
+
+    if ($Inverted) {
+        if ($pct -ge 91) { "DarkRed" }
+        elseif ($pct -ge 76) { "Red" }
+        elseif ($pct -ge 51) { "Yellow" }
+        #elseif ($pct -ge 11) { "Green" }
+        else { "Green" }
+    } else {
+        if ($pct -ge 51) { "Green" }
+        elseif ($pct -ge 26) { "Yellow" }
+        elseif ($pct -ge 11) { "Red" }
+        else { "DarkRed" }
+    }
+}
+
+<# Legacy mf
 function Get-HPColor {
     param([int]$Value, [int]$UpBand=66, [int]$MidBand=33, [int]$LowBand=9, [string]$UpBandColor="Green", [string]$MidBandColor="Yellow", [string]$LowBandColor="Red", [string]$EmptyBandColor="DarkRed", [string]$zeroColor="DarkRed")
     if     ($Value -ge $UpBand)  { $UpBandColor }
@@ -265,7 +292,7 @@ function Get-HPColor {
     elseif ($Value -ge $LowBand) { $LowBandColor }
     elseif ($Value -eq 0)        { $zeroColor }
     else                         { $EmptyBandColor }
-}
+}#>
 
 function Get-HazardColor($Value) {
     if ($Value -ge 85) { "DarkRed" }
@@ -282,14 +309,39 @@ function Get-RarityColor($rarity) {
         "Rare"        { "Cyan" }
         "SuperRare"   { "Magenta" }
         "Consumable"  { "Green" }
-        "Upgrade"     { "Blue" }
+        "Upgrade"     { "DarkGreen" }
     }
+}
+
+function Flash-DamageBackground {
+    param(
+        [scriptblock]$RedrawAction
+    )
+    # Store current color
+    $originalColor = $host.UI.RawUI.BackgroundColor
+    
+    # Trigger Red Flash
+    $host.UI.RawUI.BackgroundColor = "DarkRed"
+    Clear-Host
+    
+    # Execute the redraw so the screen isn't empty during the flash
+    if ($RedrawAction) { &$RedrawAction }
+    
+    Start-Sleep -Milliseconds 100
+    
+    # Revert to Black
+    $host.UI.RawUI.BackgroundColor = "Black"
+    Clear-Host
+
+    # Re-execute the redraw immediately so the screen isn't empty after the flash
+    if ($RedrawAction) { &$RedrawAction }
 }
 
 function Pause { Read-Host "Press Enter" | Out-Null }
 #endregion
 
 #region ##### Mechanics #####
+
 function Prospect {
     $planetData = $CurrentSolarSystem[$Player.Location]
     $startTime = Get-Date
@@ -297,7 +349,8 @@ function Prospect {
     $sessionLog = New-Object System.Collections.Generic.List[PSObject]
 	$maxVisibleLines = 16
     
-    while ($true) {
+    # Define the UI drawing logic in one place so we can call it during flashes
+    $DrawUI = {
         Show-Header -Prospecting
         $elapsed = (Get-Date) - $startTime
         $cycleColor = if ($elapsed.Seconds % 2 -eq 0) { "Yellow" } else { "DarkYellow" }
@@ -330,21 +383,25 @@ function Prospect {
         Write-Host ""
         Write-Host -NoNewLine "   Prospecting for: "
 		Write-Host "$($elapsed.ToString('mm\:ss'))" -ForegroundColor Cyan
-        Write-Host -NoNewLine "   Press "
-		Write-Host -NoNewLine "[ANY KEY]" -ForegroundColor DarkCyan
+        Write-Host -NoNewline "   Press "
+		Write-Host -NoNewline "[ANY KEY]" -ForegroundColor DarkCyan
 		Write-Host " to stop prospecting..."
+    }
+
+    while ($true) {
+        # Standard Redraw
+        &$DrawUI
 
 		if (((Get-Date) - $lastYieldTime).TotalSeconds -ge 2) {
 			$lastYieldTime = Get-Date
 
 			if ($Player.Fuel -gt 0) {
-				if ((Get-CurrentWeight) -lt $Player.MaxWeight) {
-					# ----- Weighted Resource Roll -----
+				if ((Get-CurrentWeight) -lt $Player.MaxWeight) { 
 					$totalWeight = 0
 					foreach ($value in $planetData.Resources.Values) {
 						$totalWeight += $value
 					}
-					$roll = Get-Random -Minimum 1 -Maximum ($totalWeight + 1)
+					$roll = Get-Random -Minimum 1 -Maximum ($totalWeight + 1) # - Weighted Resource Roll -
 
 					$cumulative = 0
 					$resName = $null
@@ -380,11 +437,15 @@ function Prospect {
 
 		$maxDmg=[int]($planetData.Hazard / 2)
 		if ($maxDmg -lt 1) { $maxDmg = 1 }
-        if ((Get-Random -Min 1 -Max 100) -le ($planetData.Hazard / 4)) {
+        if ((Get-Random -Min 1 -Max 100) -le ($planetData.Hazard / 4)) { # Damage roll O////||>>>>>>>>>
             $dmg = Get-Random -Min 1 -Max $maxDmg
             $Player.HP -= $dmg
             $reason = if ($planetData.HazardReasons) { $planetData.HazardReasons | Get-Random } else { "Hull stress" }
             $sessionLog.Insert(0, @{ Text = "-$dmg HP - $reason"; Color = "Red" })
+
+			# Trigger the visual flash, passing the UI drawing logic to keep it visible
+			# Now handles redrawing both during the flash and after the revert
+			Flash-DamageBackground -RedrawAction $DrawUI
         }
 
         if ($Player.HP -le 0) { break }
@@ -412,7 +473,8 @@ function Use-Item($ItemName) {
     switch ($itemMaster.Effect) {
         "Fuel"      { $Player.Fuel = [Math]::Min($Player.MaxFuel, $Player.Fuel + $itemMaster.EffectValue) }
         "MaxFuel"   { $Player.MaxFuel += $itemMaster.EffectValue; $Player.Fuel += $itemMaster.EffectValue }
-        "HP"        { $Player.HP   = [Math]::Min(100, $Player.HP   + $itemMaster.EffectValue) }
+        "HP"        { $Player.HP   = [Math]::Min($player.MaxHP, $Player.HP   + $itemMaster.EffectValue) }
+		"MaxHP"        { $Player.MaxHP += $itemMaster.EffectValue; $Player.HP += $itemMaster.EffectValue }
         "MaxWeight" { $Player.MaxWeight += $itemMaster.EffectValue }
     }
 
@@ -429,33 +491,51 @@ function Show-Header {
     $planetData = $CurrentSolarSystem[$Player.Location]
     $weight = Get-CurrentWeight
     
-    Write-Host -NoNewline "CD="
+    # Credits
+    Write-Host -BackgroundColor Black -NoNewline "CD="
     Write-Host -NoNewline $Player.Credits -ForegroundColor Yellow
-    Write-Host -NoNewline " | HP="
-    Write-Host -NoNewline "$($Player.HP)%" -ForegroundColor (Get-HPColor $Player.HP)
     
-    # Fuel UI Logic
-    $fuelPercent = [int](($Player.Fuel / $Player.MaxFuel) * 100)
-    Write-Host -NoNewline " | FL="
-    Write-Host -NoNewline "$($fuelPercent)%" -ForegroundColor (Get-HPColor $fuelPercent)
-    Write-Host -NoNewline " ($($Player.Fuel)/$($Player.MaxFuel))"
+    # HP (High = Good)
+    Write-Host -BackgroundColor Black -NoNewline " | HP="
+    $hpCol = Get-PercentColor -Current $Player.HP -Max 100
+    Write-Host -BackgroundColor Black -NoNewline "$($Player.HP)" -ForegroundColor $hpCol
+	Write-Host -BackgroundColor Black -NoNewline "/$($Player.MaxHP)"
     
-    Write-Host -NoNewline " | WT="
-    $wtCol = Get-HPColor -value $weight -UpBand 90 -UpBandColor "DarkRed" -MidBand 75 -MidBandColor "Red" -LowBand 50 -LowBandColor "Yellow" -EmptyBandColor "Green"
-    Write-Host -NoNewline "$weight" -ForegroundColor $wtCol
-    Write-Host -NoNewline "/$($Player.MaxWeight)" 
+    # Fuel (High = Good)
+    #$fuelPercent = [int](($Player.Fuel / $Player.MaxFuel) * 100)
+    Write-Host -BackgroundColor Black -NoNewline " | FL="
+    $fuelCol = Get-PercentColor -Current $Player.Fuel -Max $Player.MaxFuel
+    #Write-Host -NoNewline "$($fuelPercent)%" -ForegroundColor $fuelCol
+    Write-Host -BackgroundColor Black -NoNewline " $($Player.Fuel)" -ForegroundColor $fuelCol
+	Write-Host -BackgroundColor Black -NoNewline "/$($Player.MaxFuel)"
     
+    # Weight (High = Bad/Inverted)
+    Write-Host -BackgroundColor Black -NoNewline " | WT="
+    $wtCol = Get-PercentColor -Current $weight -Max $Player.MaxWeight -Inverted
+    Write-Host -BackgroundColor Black -NoNewline "$weight" -ForegroundColor $wtCol
+    Write-Host -BackgroundColor Black -NoNewline "/$($Player.MaxWeight)" 
+    
+    # Orbit/System Info
     $label = if ($Prospecting) { "Prospecting: " } else { "Orbiting: " }
-    Write-Host -NoNewline " | $label" 
-    Write-Host -NoNewline $Player.Location -ForegroundColor ($planetData.PlanetColor)
-	Write-Host -NoNewLine ", HZ="
-	Write-Host -NoNewLine "$($PlanetData.Hazard)" -ForegroundColor (Get-HazardColor $planetData.Hazard)
-    Write-Host " | $(Get-Clock)"
+    Write-Host -BackgroundColor Black -NoNewline " | $label" 
+    Write-Host -BackgroundColor Black -NoNewline $Player.Location -ForegroundColor ($planetData.PlanetColor)
+	Write-Host -BackgroundColor Black -NoNewLine ", HZ="
+	Write-Host -BackgroundColor Black -NoNewLine "$($PlanetData.Hazard)" -ForegroundColor (Get-HazardColor $planetData.Hazard)
+    Write-Host -BackgroundColor Black " | $(Get-Clock)"
 
+    # Status Messages
     if ($Player.Message) {
         Write-Host ""
         Write-Host "   $($Player.Message)" -ForegroundColor DarkGray
         $Player.Message = $null
+    }
+
+    if ($Player.LastLoot) {
+        Write-Host ""
+        Write-Host -NoNewline "   "
+        Write-Host -NoNewline "+$($Player.LastLoot.Quantity) " -ForegroundColor Green
+        Write-Host $Player.LastLoot.Name -ForegroundColor (Get-RarityColor $Player.LastLoot.Rarity)
+        $Player.LastLoot = $null
     }
 
     if ($Player.Dialog) {
@@ -488,28 +568,38 @@ function Show-Inventory {
         Write-Host ""
         Write-Host -NoNewline "[1] " -ForegroundColor Cyan; Write-Host "Back" -ForegroundColor DarkGray
         
-        $sortedKeys = $Inventory.Keys | ForEach-Object {
+        # Explicitly wrap in @() to ensure it's ALWAYS an array, even with 1 item
+        $sortedKeys = @($Inventory.Keys | ForEach-Object {
             $m = $ResourceMaster[$_]
             [PSCustomObject]@{ Name = $_; RarityOrder = $global:RarityOrder[$m.Rarity]; Master = $m }
-        } | Sort-Object RarityOrder, Name
+        } | Sort-Object RarityOrder, Name)
 
         $i = 2
         foreach ($item in $sortedKeys) {
             $qtyString = "x" + $Inventory[$item.Name]
+            
             Write-Host -NoNewline "[$i] " -ForegroundColor Cyan
             Write-Host -NoNewline ($qtyString.PadRight($maxQtyLength + 2)) -ForegroundColor Cyan
             Write-Host -NoNewline ($item.Name.PadRight(15)) -ForegroundColor (Get-RarityColor $item.Master.Rarity)
-            Write-Host " | $($item.Master.Description)"
+			$desc = $item.Master.Description
+            if ($item.Master.Effect) { Write-Host -NoNewline " | $desc"; Write-Host -NoNewline " (";Write-Host -NoNewline "$($item.Master.Rarity)" -ForegroundColor (Get-RarityColor $item.Master.Rarity); Write-Host ": +$($item.Master.EffectValue) $($item.Master.Effect))" }
+			else { Write-Host -NoNewline " | $desc"; Write-Host -NoNewline "(";Write-Host -NoNewline "$($item.Master.Rarity)" -ForegroundColor (Get-RarityColor $item.Master.Rarity);Write-Host")"} 
             $i++
         }
         
         $choice = Read-Host ">"
         if ($choice -eq "1") { return }
-        if ($choice -match "^\d+$") {
-            $index = [int]$choice - 2
+        if ($choice -as [int]) {
+            $selection = [int]$choice
+            $index = $selection - 2
+            # Check count on the explicitly cast array
             if ($index -ge 0 -and $index -lt $sortedKeys.Count) {
                 $selected = $sortedKeys[$index].Name
-                if ($ResourceMaster[$selected].Consumable) { Use-Item $selected; return }
+                if ($ResourceMaster[$selected].Consumable) { 
+                    Use-Item $selected 
+                } else {
+                    $Player.Message = "$selected is not consumable."
+                }
             }
         }
     }
@@ -526,7 +616,7 @@ function Show-TraderMenu {
         $planetData = $CurrentSolarSystem[$planetName]
         $missingFuel = $Player.MaxFuel - $Player.Fuel
         $fuelPrice = [math]::Ceiling(($missingFuel * 0.5) * $planetData.FuelModifier)
-        $missingHP = 100 - $Player.HP
+        $missingHP = $Player.MaxHP - $Player.HP
         $repairPrice = [math]::Ceiling(($missingHP * 1.0) * $planetData.RepairModifier)
         $fuelColor = if ($Player.Credits -ge $fuelPrice) { "Green" } else { "Red" }
         $repairColor = if ($Player.Credits -ge $repairPrice) { "Green" } else { "Red" }
@@ -538,10 +628,10 @@ function Show-TraderMenu {
             "2" { Show-BuyMenu }
             "3" { Show-SellMenu }
 			"4" {
-					if ($Player.HP -eq 100) { $Player.Dialog=$planetData.Dialog.Frustrated } 
+					if ($Player.HP -ge $Player.MaxHP) { $Player.Dialog=$planetData.Dialog.Frustrated } 
                     else {
 						if ($Player.Credits -ge $repairPrice) {
-							$Player.Credits -= $repairPrice; $Player.HP = 100; $Player.Dialog=$planetData.Dialog.Repair
+							$Player.Credits -= $repairPrice; $Player.HP = $Player.MaxHP; $Player.Dialog=$planetData.Dialog.Repair
 						} else { $Player.Dialog=$planetData.Dialog.InsufficientFunds }
 					}
             }
@@ -562,7 +652,16 @@ function Show-BuyMenu {
     Initialize-Trader $planetName
     $trader = $global:TraderState[$planetName]
     while ($true) {
-        if ($null -eq $trader) { return }
+        # Explicitly wrap in @() to fix "single item selection" bug
+        $sortedStock = @($trader.Stock.Keys | ForEach-Object {
+            $m = $ResourceMaster[$_]
+            [PSCustomObject]@{ Name = $_; RarityOrder = $global:RarityOrder[$m.Rarity]; Master = $m }
+        } | Sort-Object RarityOrder, Name)
+
+        if ($null -eq $trader -or $sortedStock.Count -eq 0) { 
+            $Player.Message = "Trader is out of stock."
+            return 
+        }
         $maxQtyLength = 1
         foreach ($name in $trader.Stock.Keys) {
             $len = ($trader.Stock[$name]).ToString().Length
@@ -574,42 +673,55 @@ function Show-BuyMenu {
         Write-Host ""
         Write-Host -NoNewline "[1] " -ForegroundColor Cyan; Write-Host "Back" -ForegroundColor DarkGray
         
-        $sortedStock = $trader.Stock.Keys | ForEach-Object {
-            $m = $ResourceMaster[$_]
-            [PSCustomObject]@{ Name = $_; RarityOrder = $global:RarityOrder[$m.Rarity]; Master = $m }
-        } | Sort-Object RarityOrder, Name
-
         $i = 2
         foreach ($item in $sortedStock) {
             $qtyString = "x" + $trader.Stock[$item.Name]
             $priceColor = if ($Player.Credits -ge $item.Master.Value) { "Green" } else { "Red" }
+            
+            # Dynamic Description with Effects
+            $desc = $item.Master.Description
+            if ($item.Master.Effect) {
+                $desc = "$desc ($($item.Master.Rarity) - +$($item.Master.EffectValue) $($item.Master.Effect))"
+            } else {
+                $desc = "$desc ($($item.Master.Rarity))"
+            }
+
             Write-Host -NoNewline "[$i] " -ForegroundColor Cyan
             Write-Host -NoNewline ("{0,5}" -f $item.Master.Value + " CD") -ForegroundColor $priceColor
             Write-Host -NoNewline " | "
             Write-Host -NoNewline ($qtyString.PadRight($maxQtyLength + 2)) -ForegroundColor Cyan
             Write-Host -NoNewline ($item.Name.PadRight(15)) -ForegroundColor (Get-RarityColor $item.Master.Rarity)
-            Write-Host " | $($item.Master.Description)"
+            $desc = $item.Master.Description
+            if ($item.Master.Effect) { Write-Host -NoNewline " | $desc"; Write-Host -NoNewline " (";Write-Host -NoNewline "$($item.Master.Rarity)" -ForegroundColor (Get-RarityColor $item.Master.Rarity); Write-Host ": +$($item.Master.EffectValue) $($item.Master.Effect))" }
+			else { Write-Host -NoNewline " | $desc"; Write-Host -NoNewline "(";Write-Host -NoNewline "$($item.Master.Rarity)" -ForegroundColor (Get-RarityColor $item.Master.Rarity);Write-Host")"} 
             $i++
         }
         
         $input = Read-Host ">"
         if ($input -eq "1") { return }
-        if ($input -match "^\d+$") {
-            $index = [int]$input - 2
+        if ($input -as [int]) {
+            $selection = [int]$input
+            $index = $selection - 2
             if ($index -ge 0 -and $index -lt $sortedStock.Count) {
                 $selectedName = $sortedStock[$index].Name
                 $m = $ResourceMaster[$selectedName]
                 $stockQty = $trader.Stock[$selectedName]
-                Write-Host -NoNewline "[?] Buy how many "
-                Write-Host -NoNewline "$selectedName" -ForegroundColor (Get-RarityColor $m.Rarity)
-                Write-Host " (A for all)?"
-                $qtyInput = Read-Host ">"
-                if ($qtyInput -match "^[aA]$") { $qty = $stockQty }
-                elseif ($qtyInput -match "^\d+$") { $qty = [int]$qtyInput }
-                else { continue }
+                
+                $qty = 1
+                if ($stockQty -gt 1) {
+                    Write-Host -NoNewline "[?] Buy how many "
+                    Write-Host -NoNewline "$selectedName" -ForegroundColor (Get-RarityColor $m.Rarity)
+                    Write-Host " (A for all)?"
+                    $qtyInput = Read-Host ">"
+                    if ($qtyInput -match "^[aA]$") { $qty = $stockQty }
+                    elseif ($qtyInput -as [int]) { $qty = [int]$qtyInput }
+                    else { continue }
+                }
+
                 if ($qty -le 0 -or $qty -gt $stockQty) { continue }
                 $totalCost = $m.Value * $qty
                 if ($Player.Credits -lt $totalCost) { $Player.Dialog = $CurrentSolarSystem[$planetName].Dialog.InsufficientFunds; continue }
+                
                 $Player.Credits -= $totalCost
                 $trader.Credits += $totalCost
                 if ($trader.Stock[$selectedName] -le $qty) { $trader.Stock.Remove($selectedName) }
@@ -627,7 +739,16 @@ function Show-SellMenu {
     Initialize-Trader $planetName
     $trader = $global:TraderState[$planetName]
     while ($true) {
-        if ($null -eq $trader) { return }
+        # Explicitly wrap in @() to fix "single item selection" bug
+        $sortedInv = @($Inventory.Keys | ForEach-Object {
+            $m = $ResourceMaster[$_]
+            [PSCustomObject]@{ Name = $_; RarityOrder = $global:RarityOrder[$m.Rarity]; Master = $m }
+        } | Sort-Object RarityOrder, Name)
+
+        if ($null -eq $trader -or $sortedInv.Count -eq 0) { 
+            $Player.Message = "Your cargo hold is empty."
+            return 
+        }
         $maxQtyLength = 1
         foreach ($name in $Inventory.Keys) {
             $len = ($Inventory[$name]).ToString().Length
@@ -642,40 +763,52 @@ function Show-SellMenu {
         
         Write-Host -NoNewline "[1] " -ForegroundColor Cyan; Write-Host "Back" -ForegroundColor DarkGray
         
-        $sortedInv = $Inventory.Keys | ForEach-Object {
-            $m = $ResourceMaster[$_]
-            [PSCustomObject]@{ Name = $_; RarityOrder = $global:RarityOrder[$m.Rarity]; Master = $m }
-        } | Sort-Object RarityOrder, Name
-
         $i = 2
         foreach ($item in $sortedInv) {
             $sellValue = [math]::Floor($item.Master.Value * 0.69)
             $priceColor = if ($trader.Credits -ge $sellValue) { "Green" } else { "Red" }
             $qtyString = "x" + $Inventory[$item.Name]
+
+            # Dynamic Description with Effects
+            $desc = $item.Master.Description
+            if ($item.Master.Effect) {
+                $desc = "$desc ($($item.Master.Rarity) - +$($item.Master.EffectValue) $($item.Master.Effect))"
+            } else {
+                $desc = "$desc ($($item.Master.Rarity))"
+            }
+
             Write-Host -NoNewline "[$i] " -ForegroundColor Cyan
             Write-Host -NoNewline ("{0,5}" -f $sellValue + " CD") -ForegroundColor $priceColor
             Write-Host -NoNewline " | "
             Write-Host -NoNewline ($qtyString.PadRight($maxQtyLength + 2)) -ForegroundColor Cyan
             Write-Host -NoNewline ($item.Name.PadRight(15)) -ForegroundColor (Get-RarityColor $item.Master.Rarity)
-            Write-Host " | $($item.Master.Description)"
+            $desc = $item.Master.Description
+            if ($item.Master.Effect) { Write-Host -NoNewline " | $desc"; Write-Host -NoNewline " (";Write-Host -NoNewline "$($item.Master.Rarity)" -ForegroundColor (Get-RarityColor $item.Master.Rarity); Write-Host ": +$($item.Master.EffectValue) $($item.Master.Effect))" }
+			else { Write-Host -NoNewline " | $desc"; Write-Host -NoNewline "(";Write-Host -NoNewline "$($item.Master.Rarity)" -ForegroundColor (Get-RarityColor $item.Master.Rarity);Write-Host")"} 
             $i++
         }
         
         $input = Read-Host ">"
         if ($input -eq "1") { return }
-        if ($input -match "^\d+$") {
-            $index = [int]$input - 2
+        if ($input -as [int]) {
+            $selection = [int]$input
+            $index = $selection - 2
             if ($index -ge 0 -and $index -lt $sortedInv.Count) {
                 $selectedName = $sortedInv[$index].Name
                 $m = $ResourceMaster[$selectedName]
                 $playerQty = $Inventory[$selectedName]
-                Write-Host -NoNewline "[?] Sell how many "
-                Write-Host -NoNewline "$selectedName" -ForegroundColor (Get-RarityColor $m.Rarity)
-                Write-Host " (A for all)?"
-                $qtyInput = Read-Host ">"
-                if ($qtyInput -match "^[aA]$") { $qty = $playerQty }
-                elseif ($qtyInput -match "^\d+$") { $qty = [int]$qtyInput }
-                else { continue }
+                
+                $qty = 1
+                if ($playerQty -gt 1) {
+                    Write-Host -NoNewline "[?] Sell how many "
+                    Write-Host -NoNewline "$selectedName" -ForegroundColor (Get-RarityColor $m.Rarity)
+                    Write-Host " (A for all)?"
+                    $qtyInput = Read-Host ">"
+                    if ($qtyInput -match "^[aA]$") { $qty = $playerQty }
+                    elseif ($qtyInput -as [int]) { $qty = [int]$qtyInput }
+                    else { continue }
+                }
+
                 if ($qty -le 0 -or $qty -gt $playerQty) { continue }
                 $sellValue = [math]::Floor($m.Value * 0.69)
                 $total = $sellValue * $qty
@@ -683,6 +816,7 @@ function Show-SellMenu {
                     $Player.Dialog = $CurrentSolarSystem[$planetName].Dialog.InsufficientFundsTrader
                     continue 
                 }
+                
                 $Player.Credits += $total
                 $trader.Credits -= $total
                 if (-not $trader.Stock.ContainsKey($selectedName)) { $trader.Stock[$selectedName] = 0 }
@@ -697,19 +831,41 @@ function Show-SellMenu {
 }
 
 function Show-Death {
-    Clear-Host
-    Write-Host ""
-    Write-Host "##    ##  ######  ##    ##     ######  ## ####### ###### " -ForegroundColor Red
-    Write-Host " ##  ##  ##    ## ##    ##     ##   ## ## ##      ##   ##" -ForegroundColor Red
-    Write-Host "  ####   ##    ## ##    ##     ##   ## ## #####   ##   ##" -ForegroundColor Red
-    Write-Host "   ##    ##    ## ##    ##     ##   ## ## ##      ##   ##" -ForegroundColor Red
-    Write-Host "   ##     ######   ######      ######  ## ####### ###### " -ForegroundColor Red
-    Write-Host ""
-    $total=$Player.Credits
+	# Calculate Total Value:
+	$total=$Player.Credits
     foreach ($item in $Inventory.Keys) { $total += ($ResourceMaster[$item].Value * $Inventory[$item]) }
-    Write-Host -NoNewline "Final Credits: "; Write-Host "$total" -ForegroundColor Yellow
-    Write-Host -NoNewline "Total Flight Time: "; Write-Host (Get-SurvivedTime) -ForegroundColor Cyan
-    Write-Host ""
+	
+Write-Host "                      ..-%@@@@%-.:                   " -ForegroundColor DarkRed
+Write-Host "                @@@@@@@@@@@@@@@@@@@@%:               " -ForegroundColor DarkRed
+Write-Host "             =%############%@.@@@@@@@@@#             " -ForegroundColor DarkRed
+Write-Host "          .##.. ============.%@@@%+@@@@@@@#:         " -ForegroundColor DarkRed
+Write-Host "        .#..==:-.------------.===.#####@@@@##        " -ForegroundColor DarkRed -NoNewline;Write-Host "    >=>      >=>     >===>      >=>     >=>  " -ForegroundColor Red
+Write-Host "       .#.=.--:.=============.--  .= *#######.       " -ForegroundColor DarkRed -NoNewline;Write-Host "     >=>    >=>    >=>    >=>   >=>     >=>  " -ForegroundColor Red
+Write-Host "      -# =---.==@###########==.  +.--.=.##+####      " -ForegroundColor DarkRed -NoNewline;Write-Host "     >=>    >=>    >=>    >=>   >=>     >=>  " -ForegroundColor Red
+Write-Host "      *- --.@@@############.   *====----:##*#-#      " -ForegroundColor DarkRed -NoNewline;Write-Host "        >=>      >=>        >=> >=>     >=>  " -ForegroundColor Red
+Write-Host "      #=.-.@@@%#######         ####===---..#.=#.     " -ForegroundColor DarkRed -NoNewline;Write-Host "        >=>      >=>        >=> >=>     >=>  " -ForegroundColor Red
+Write-Host "      =%=.:#@@@@@@##   #######   #####=.---.-#--+    " -ForegroundColor DarkRed -NoNewline;Write-Host "        >=>      >=>        >=> >=>     >=>  " -ForegroundColor Red
+Write-Host "       +..@@#....@ #######@%##@   ####==----.-*.:    " -ForegroundColor DarkRed -NoNewline;Write-Host "        >=>        >=>     >=>  >=>     >=>  " -ForegroundColor Red
+Write-Host "       %=#.-------.%#####.-----  ##@%#+=----- :#:*   " -ForegroundColor DarkRed -NoNewline;Write-Host "        >=>          >===>        >====>     " -ForegroundColor Red
+Write-Host "       #.:+--------@@@.==----:  .---##%=-----.:..@@.@" -ForegroundColor DarkRed -NoNewline;Write-Host "                                             " -ForegroundColor Red
+Write-Host "       --.=-------@@@@=#=--:  -. .---*#.-----+#:#@.@@" -ForegroundColor DarkRed -NoNewline;Write-Host "       >====>     >=> >=======> >====>       " -ForegroundColor Red
+Write-Host "       -.#=+-----@.-@###--- ---- ----+#------+::###@*" -ForegroundColor DarkRed -NoNewline;Write-Host "       >=>   >=>  >=> >=>       >=>   >=>    " -ForegroundColor Red
+Write-Host "        .#@.==+.#:--:####.  ---- -  .##-----::..####%" -ForegroundColor DarkRed -NoNewline;Write-Host "       >=>    >=> >=> >=>       >=>    >=>   " -ForegroundColor Red
+Write-Host "       ####%#%###.---@##  @*:=-----. #%-----=.:#.%--:" -ForegroundColor DarkRed -NoNewline;Write-Host "       >=>    >=> >=> >=====>   >=>    >=>   " -ForegroundColor Red
+Write-Host "      ..######+##.-:--@ #####@@@@@@% %#=..--#*-#--#-=" -ForegroundColor DarkRed -NoNewline;Write-Host "       >=>    >=> >=> >==       >=>    >=>   " -ForegroundColor Red
+Write-Host "      .:#.====####--=--@###-#####-###   #=.-#+-#.--. " -ForegroundColor DarkRed -NoNewline;Write-Host "       >=>   >=>  >=> >=>       >=>   >=>    " -ForegroundColor Red
+Write-Host "      # -----:.##+.#--@##########:## ##:--##.#.-.    " -ForegroundColor DarkRed -NoNewline;Write-Host "       >====>     >=> >=======> >====>       " -ForegroundColor Red
+Write-Host "    ..+..---- ###%#######@#=.=. -..+ =:--##.#*==@.   " -ForegroundColor DarkRed
+Write-Host "      #===.--*+*##@%%%@#:@#-- ---+--=--.##=###+.##.  " -ForegroundColor DarkRed -NoNewline;Write-Host -NoNewline "              Final Credits: ";Write-Host "$total" -ForegroundColor Yellow
+Write-Host "      -#.==---.@:#.#=@.@. ++#+----==+--##.=#*##=:-.  " -ForegroundColor DarkRed -NoNewline;Write-Host -NoNewline "          Total Flight Time: ";Write-Host (Get-SurvivedTime) -ForegroundColor Cyan
+Write-Host "    .@:#.-=--:*%..#=%.%#.-.+=---%+@@@#..####@.+:     " -ForegroundColor DarkRed
+Write-Host "      +@=*#-:-+=##.-# ###.%-==+.@@@@--:##.#####..    " -ForegroundColor DarkRed
+Write-Host "      ..@#-##.==.=%##%%##. #####.--=@@%.###%-#+.     " -ForegroundColor DarkRed  -NoNewline;Write-Host -NoNewline "               Game version: ";Write-Host $SpacegameVersion -ForegroundColor Green
+Write-Host "      ==.@##=.############# --.##@@*:@@####.=+       " -ForegroundColor DarkRed
+Write-Host "      #==.-- ########%%########.-.@@@@#%##.+         " -ForegroundColor DarkRed
+Write-Host "       ==%.--------:...:---=%##+--:##.#==            " -ForegroundColor DarkRed
+#Write-Host "                +:##...:---------.#%.##%.=.          " -ForegroundColor DarkRed
+#Write-Host "                    =.-:.-+#######:-..               " -ForegroundColor DarkRed
     Pause
 }
 
@@ -851,7 +1007,7 @@ function Show-OrbitMenu {
         "1" { return "Depart" }
         "2" { return "Inventory" }
         "3" { return "Prospect" }
-        "4" { if ($planetData.Inhabited) { return "Trade" } }
+        "4" { $Player.Dialog=$planetData.Dialog.TradeGreeting ; if ($planetData.Inhabited) { return "Trade" } }
         #"0" { return "Debug" }
     }
     return $null
@@ -876,8 +1032,11 @@ while ($true) {
 }
 #endregion
 
+# CHANGELOG
+# 0.0.0 - 02/19/2026
+# 0.0.1 - Added a better death screen. Added damage backgroundcolor flashes. Revised Buy/Sell/Inv: No longer returns upon every selection, can now select final item, items now list their rarity and effects.Replaced Get-HPColor with Get-PercentColor for dynamic scaling. 
+
 # To add...
 # New factions arent listed on Solar Menu until found.
 # Quest mechanics (accepting/managing/completing) for unique rewards.
 # Require GasGiant and IceGiant prospecting drill upgrades before they can be prospected. 
-
