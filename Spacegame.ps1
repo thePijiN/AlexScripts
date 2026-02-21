@@ -1,5 +1,5 @@
 Clear-Host
-$SpacegameVersion = "0.0.1"
+$SpacegameVersion = "0.0.2"
 # region ##### GAME INITIALIZER #####
 function Start-NewGame {
     # Set the global start time for the survival clock
@@ -80,6 +80,40 @@ function Start-NewGame {
 		#  -Gas Giant Drill
 		#  -Ice Giant Drill 
 	}
+	
+	##### Damage multipliers for Hazards #####
+	$global:HazardMaster = @{
+		# Universal / Low Severity
+		"Hull stress"                = 0.2
+		"Micro-vibrations"           = 0.5
+		"Static discharge"           = 0.8
+		"Atmospheric turbulence"     = 1.0
+
+		# Moderate Severity
+		"Tectonic shift"			 = 1.6
+		"Solar flare radiation"      = 1.5
+		"Acid rain corrosion"        = 1.8
+		"Dust storm abrasion"        = 1.4
+		"Extreme cold stress"        = 1.5
+		"Gravity well shear"         = 1.8
+
+		# High Severity
+		"Ring shard impact"          = 3.0
+		"Magma spray"                = 3.0
+		"Lightning discharge"        = 2.5
+		"Methane pressure spike"     = 2.5
+		"Cryo-geyser eruption"       = 2.2
+		"Supersonic wind shear"      = 2.0
+		
+		# Catastrophic Severity
+		"Extreme Lightning discharge"= 5
+		"Asteroid impact"			 = 4.5
+		"Super-cyclone vortex"       = 4.2
+		"Tectonic plate collapse"	 = 4
+		
+		# Catacylysmic Severity
+		"Singularity"				 = 100
+	}
 
     # Define rarity order for sorting logic
     $global:RarityOrder = @{
@@ -93,121 +127,104 @@ function Start-NewGame {
 
 	$global:SolSystem = @{
 		_Metadata = @{ Name = "The Sol System" }
-		# Terrestrial
+		# Terrestrial 
 		Mercury  = @{ 
-			Distance    = 0.4; Inhabited = $false; Type = "Terrestrial"; Hazard = 70
-			Description = "Mostly magma." ; PlanetColor="DarkYellow"
-			Resources   = @{ "Iron" = 30; "Nickel" = 20; "Silicates" = 20; "Sulfur" = 15; "Gold" = 10; "Copper" = 5 }
-			HazardReasons = @("Solar flare radiation", "Tidal heating quake", "Magma spray")
+			Distance    = 0.4; Inhabited = $false; Type = "Terrestrial"; Hazard = 70; PlanetColor="DarkYellow"
+			Description = "Mostly magma."
+			Resources   = @{ "Iron" = 450; "Nickel" = 250; "Silicates" = 150; "Sulfur" = 100; "Gold" = 45; "Copper" = 5 }
+			HazardReasons = @("Solar flare radiation", "Magma spray", "Hull stress", "Micro-vibrations", "Tectonic shift", "Tectonic plate collapse")
 		}
 		Venus    = @{ 
-			Distance    = 0.7; Inhabited = $false; Type = "Terrestrial"; Hazard = 80
-			Description = "Very bright." ; PlanetColor="Yellow"
-			Resources   = @{ "SulfuricAcid" = 45; "Nitrogen" = 20; "Sulfur" = 20; "Nickel" = 10 ; "Gold" = 1; "Silver" = 4}
-			HazardReasons = @("Acid rain corrosion", "Atmospheric pressure spike", "Super-rotation turbulence")
+			Distance    = 0.7; Inhabited = $false; Type = "Terrestrial"; Hazard = 80; PlanetColor="Yellow"
+			Description = "Very bright."
+			Resources   = @{ "SulfuricAcid" = 550; "Nitrogen" = 200; "Sulfur" = 150; "Nickel" = 85; "Silver" = 12; "Gold" = 3 }
+			HazardReasons = @("Acid rain corrosion", "Atmospheric turbulence", "Hull stress", "Static discharge", "Tectonic shift", "Tectonic plate collapse")
 		}
 		Earth    = @{ 
-			Distance    = 1.0; Inhabited = $true;  Type = "Terrestrial"; Hazard = 10
+			Distance    = 1.0; Inhabited = $true;  Type = "Terrestrial"; Hazard = 10; PlanetColor="Green"
 			Description = "Home?"
-			Resources   = @{ "Water" = 40; "Biomass" = 20; "ScrapMetal" = 20; "Iron" = 10; "Copper" = 5; "Gold" = 1; "Silver" = 2; "Uranium" = 1; "Fossils" = 1 }
-			HazardReasons = @("Hull stress", "Landslide", "Inclement weather", "Earthquake")
-			TraderName="U.C.E.O.C.S."; TotalTraderCredits=5000; FuelModifier=1.2; RepairModifier=2.0; PlanetColor="Green"
+			Resources   = @{ "Water" = 400; "ScrapMetal" = 200; "Iron" = 113; "Copper" = 100; "Biomass" = 150; "Silver" = 20; "Uranium" = 10; "Gold"  = 5; "Fossils" = 2 }
+			HazardReasons = @("Atmospheric turbulence", "Hull stress", "Micro-vibrations", "Static discharge", "Tectonic shift")
+			TraderName="U.C.E.O.C.S."; TotalTraderCredits=5000; FuelModifier=1.2; RepairModifier=2.0
 			Dialog=@{
 				Greeting="Welcome to the United Countries of Earth orbital commerce services..."; TradeGreeting="How may I assist you today..."
 				Refuel="Tanks topped."; Repair="Structural integrity restored."; Trade="Credits transfered."
 				InsufficientFunds="Transaction denied."; InsufficientFundsTrader="You've surpassed your credit-limit. Try again later."
 				Frustrated="What? No."
 			}
-			TraderStock = @{ 
-				"Fuel Cell (Small)" = 3
-				"Fuel Cell (Medium)" = 2
-				"Fuel Cell (Large)" = 1
-				"Shield Cell (Small)" = 3
-				"Shield Cell (Medium)" = 2
-				"Shield Cell (Large)" = 1
-				"U.C.E. Shield Generator MK I" = 1
-				"Auxiliary Fuel Tank" = 1
-			}
+			TraderStock = @{ "Fuel Cell (Small)" = 3; "Fuel Cell (Medium)" = 2; "U.C.E. Shield Generator MK I" = 1 }
 		}
 		Mars     = @{ 
-			Distance    = 1.5; Inhabited = $true;  Type = "Terrestrial"; Hazard = 1
+			Distance    = 1.5; Inhabited = $true;  Type = "Terrestrial"; Hazard = 25; PlanetColor="DarkRed"
 			Description = "The frontier."
-			Resources   = @{ "Iron" = 50; "Silicates" = 20; "ScrapMetal" = 15; "Water" = 10; "Silver" = 5 }
-			HazardReasons = @("Hull stress", "Dust storm")
-			TraderName="Mars Colony"; TotalTraderCredits=3000; FuelModifier=1.0; RepairModifier=1.0; PlanetColor="DarkRed"
+			Resources   = @{ "Iron" = 600; "Silicates" = 250; "ScrapMetal" = 100; "Water" = 40; "Silver" = 10 }
+			HazardReasons = @("Dust storm abrasion", "Static discharge", "Hull stress", "Micro-vibrations", "Tectonic shift")
+			TraderName="Mars Colony"; TotalTraderCredits=3000; FuelModifier=1.0; RepairModifier=1.0
 			Dialog=@{
 				Greeting="Welcome back, scrapper."; TradeGreeting="What'll it be this time?"
 				Refuel="Fuel's pumpin'."; Repair="Hull patched."; Trade="Pleasure doin' business."
 				InsufficientFunds="Credits first, hero."; InsufficientFundsTrader="And what'll ya be wanting for that?."
 				Frustrated="Come again, now?"
 			}
-			TraderStock = @{ 
-				"Fuel Cell (Small)" = 3
-				"Fuel Cell (Medium)" = 2
-				"Fuel Cell (Large)" = 1
-				"Shield Cell (Small)" = 3
-				"Shield Cell (Medium)" = 2
-				"Shield Cell (Large)" = 1
-				"Cargo Baffles" = 1
-				"Auxiliary Fuel Tank" = 1
-			}
+			TraderStock = @{ "Fuel Cell (Small)" = 3; "Cargo Baffles" = 1 }
 		}
+		# Ceres
 		Ceres    = @{ 
-			Distance    = 2.8; Inhabited = $false; Type = "Asteroid";    Hazard = 5
-			Description = "An abandoned rock." ; PlanetColor="Gray"
-			Resources   = @{ "Water" = 35; "Iron" = 30; "Silicates" = 20; "Nickel" = 10 ; "Gold" = 1 ; "Silver" = 4 }
-			HazardReasons = @("Micro-asteroid impact", "Electrostatic discharge")
+			Distance    = 2.8; Inhabited = $false; Type = "Asteroid";    Hazard = 35; PlanetColor="Gray"
+			Description = "An abandoned rock."
+			Resources   = @{ "Water" = 350; "Iron" = 350; "Silicates" = 200; "Nickel" = 80; "Silver" = 15; "Gold" = 5 }
+			HazardReasons = @("Ring shard impact", "Micro-vibrations", "Hull stress", "Static discharge", "Asteroid impact")
 		}
-		# Jovian
+		# Jovian 
 		Jupiter  = @{ 
-			Distance    = 5.2; Inhabited = $false; Type = "Gas Giant";   Hazard = 95
-			Description = "Vast and hostile." ; PlanetColor="Red"
-			Resources   = @{ "Hydrogen" = 60; "Helium" = 15; "MetallicHydrogen" = 20; "Nitrogen" = 5 }
-			HazardReasons = @("Gravity well shear", "Radiative belt surge", "Ammonia storm bash")
+			Distance    = 5.2; Inhabited = $false; Type = "Gas Giant";   Hazard = 95; PlanetColor="Red"
+			Description = "Vast and hostile."
+			Resources   = @{ "Hydrogen" = 700; "Helium" = 150; "MetallicHydrogen" = 120; "Nitrogen" = 30 }
+			HazardReasons = @("Gravity well shear", "Solar flare radiation", "Hull stress", "Atmospheric turbulence", "Super-cyclone vortex")
 		}
 		Saturn   = @{ 
-			Distance    = 9.5; Inhabited = $false; Type = "Gas Giant";   Hazard = 85
-			Description = "The ringed behemoth." ; PlanetColor="Yellow"
-			Resources   = @{ "Hydrogen" = 50; "Water" = 20; "Helium" = 15; "ScrapMetal" = 10; "Silicates" = 5 }
-			HazardReasons = @("Ring shard impact", "Extreme lightning discharge")
+			Distance    = 9.5; Inhabited = $false; Type = "Gas Giant";   Hazard = 85; PlanetColor="Yellow"
+			Description = "The ringed behemoth."
+			Resources   = @{ "Hydrogen" = 650; "Water" = 200; "Helium" = 100; "ScrapMetal" = 40; "Silicates" = 10 }
+			HazardReasons = @("Ring shard impact", "Lightning discharge", "Hull stress", "Static discharge", "Super-cyclone vortex")
 		}
 		Uranus   = @{ 
-			Distance    = 19.2; Inhabited = $false; Type = "Ice Giant";   Hazard = 50
-			Description = "The tilted giant." ; PlanetColor="DarkCyan"
-			Resources   = @{ "Hydrogen" = 40; "Water" = 30; "Nitrogen" = 20; "Uranium" = 10 }
-			HazardReasons = @("Extreme cold stress", "Methane pressure spike")
+			Distance    = 19.2; Inhabited = $false; Type = "Ice Giant";   Hazard = 50; PlanetColor="DarkCyan"
+			Description = "The tilted giant."
+			Resources   = @{ "Hydrogen" = 500; "Water" = 350; "Nitrogen" = 125; "Uranium" = 25 }
+			HazardReasons = @("Extreme cold stress", "Methane pressure spike", "Hull stress", "Micro-vibrations")
 		}
 		Neptune  = @{ 
-			Distance    = 30.1; Inhabited = $false; Type = "Ice Giant";   Hazard = 55
-			Description = "Deep blue."  ; PlanetColor="Blue"
-			Resources   = @{ "Hydrogen" = 50; "SulfuricAcid" = 20; "Nitrogen" = 20; "Water" = 10 }
-			HazardReasons = @("Supersonic wind shear", "Freezing pressure")
+			Distance    = 30.1; Inhabited = $false; Type = "Ice Giant";   Hazard = 55; PlanetColor="Blue"
+			Description = "Deep blue."
+			Resources   = @{ "Hydrogen" = 600; "SulfuricAcid" = 250; "Nitrogen" = 125; "Water" = 25 }
+			HazardReasons = @("Supersonic wind shear", "Extreme cold stress", "Hull stress", "Atmospheric turbulence")
 		}
 		Pluto    = @{ 
-			Distance    = 39.5; Inhabited = $false; Type = "Dwarf";       Hazard = 20
-			Description = "The icy underdog." ; PlanetColor="White"
-			Resources   = @{ "Water" = 40; "Nitrogen" = 30; "Biomass" = 20; "Fossils" = 10 }
-			HazardReasons = @("Nitrogen ice shift", "Cryo-geyser eruption")
+			Distance    = 39.5; Inhabited = $false; Type = "Dwarf";       Hazard = 20; PlanetColor="White"
+			Description = "The icy underdog."
+			Resources   = @{ "Water" = 500; "Nitrogen" = 350; "Biomass" = 145; "Fossils" = 5 }
+			HazardReasons = @("Cryo-geyser eruption", "Extreme cold stress", "Hull stress", "Micro-vibrations", "Asteroid impact")
 		}
 		Haumea   = @{ 
-			Distance    = 43.2; Inhabited = $false; Type = "Dwarf";       Hazard = 15
-			Description = "Hi'iaka & Namaka" ; PlanetColor="Gray"
-			Resources   = @{ "Silicates" = 70; "ScrapMetal" = 20; "Iron" = 10 }
-			HazardReasons = @("Centrifugal debris impact")
+			Distance    = 43.2; Inhabited = $false; Type = "Dwarf";       Hazard = 15; PlanetColor="Gray"
+			Description = "Hi'iaka & Namaka"
+			Resources   = @{ "Silicates" = 750; "ScrapMetal" = 200; "Iron" = 50 }
+			HazardReasons = @("Micro-vibrations", "Hull stress", "Static discharge", "Asteroid impact")
 		}
 		Makemake = @{ 
-			Distance    = 45.5; Inhabited = $false; Type = "Dwarf";       Hazard = 15
-			Description = "Red and cold." ; PlanetColor="Gray"
-			Resources   = @{ "Nitrogen" = 60; "Hydrogen" = 20; "Water" = 15; "Silicates" = 5 }
-			HazardReasons = @("Sublimation collapse")
+			Distance    = 45.5; Inhabited = $false; Type = "Dwarf";       Hazard = 15; PlanetColor="Gray"
+			Description = "Red and cold."
+			Resources   = @{ "Nitrogen" = 650; "Hydrogen" = 200; "Water" = 140; "Silicates" = 10 }
+			HazardReasons = @("Extreme cold stress", "Hull stress", "Static discharge", "Asteroid impact")
 		}
 		Eris     = @{ 
-			Distance    = 67.8; Inhabited = $false; Type = "Dwarf";       Hazard = 40
-			Description = "Far-out..." ; PlanetColor="Gray"
-			Resources   = @{ "MetallicHydrogen" = 40; "ScrapMetal" = 40; "Biomass" = 20 }
-			HazardReasons = @("Interstellar radiation burst")
+			Distance    = 67.8; Inhabited = $false; Type = "Dwarf";       Hazard = 40; PlanetColor="Gray"
+			Description = "Far-out..."
+			Resources   = @{ "MetallicHydrogen" = 450; "ScrapMetal" = 450; "Biomass" = 100 }
+			HazardReasons = @("Solar flare radiation", "Hull stress", "Micro-vibrations", "Asteroid impact")
 		}
-	} 
+	}
 
 	$global:CurrentSolarSystem = $global:SolSystem
     if ($CurrentSolarSystem.ContainsKey("_Metadata")) {
@@ -347,9 +364,8 @@ function Prospect {
     $startTime = Get-Date
     $lastYieldTime = Get-Date
     $sessionLog = New-Object System.Collections.Generic.List[PSObject]
-	$maxVisibleLines = 16
+    $maxVisibleLines = 20
     
-    # Define the UI drawing logic in one place so we can call it during flashes
     $DrawUI = {
         Show-Header -Prospecting
         $elapsed = (Get-Date) - $startTime
@@ -365,7 +381,6 @@ function Prospect {
         Write-Host $planetData.Hazard -ForegroundColor (Get-HazardColor $planetData.Hazard)
         Write-Host ""
 
-		 # Log Display Logic with Scroll Indicator
         for ($i = 0; $i -lt $maxVisibleLines; $i++) {
             if ($i -lt $sessionLog.Count) { 
                 Write-Host "   $($sessionLog[$i].Text)" -ForegroundColor $sessionLog[$i].Color 
@@ -379,73 +394,73 @@ function Prospect {
         } else {
             Write-Host ""
         }
-		
+        
         Write-Host ""
         Write-Host -NoNewLine "   Prospecting for: "
-		Write-Host "$($elapsed.ToString('mm\:ss'))" -ForegroundColor Cyan
+        Write-Host "$($elapsed.ToString('mm\:ss'))" -ForegroundColor Cyan
         Write-Host -NoNewline "   Press "
-		Write-Host -NoNewline "[ANY KEY]" -ForegroundColor DarkCyan
-		Write-Host " to stop prospecting..."
+        Write-Host -NoNewline "[ANY KEY]" -ForegroundColor DarkCyan
+        Write-Host " to stop prospecting..."
     }
 
     while ($true) {
-        # Standard Redraw
         &$DrawUI
 
-		if (((Get-Date) - $lastYieldTime).TotalSeconds -ge 2) {
-			$lastYieldTime = Get-Date
+        # Resource Tick (Every 2 seconds)
+        if (((Get-Date) - $lastYieldTime).TotalSeconds -ge 2) {
+            $lastYieldTime = Get-Date
 
-			if ($Player.Fuel -gt 0) {
-				if ((Get-CurrentWeight) -lt $Player.MaxWeight) { 
-					$totalWeight = 0
-					foreach ($value in $planetData.Resources.Values) {
-						$totalWeight += $value
-					}
-					$roll = Get-Random -Minimum 1 -Maximum ($totalWeight + 1) # - Weighted Resource Roll -
+            if ($Player.Fuel -gt 0) {
+                if ((Get-CurrentWeight) -lt $Player.MaxWeight) { 
+                    $totalWeight = 0
+                    foreach ($value in $planetData.Resources.Values) { $totalWeight += $value }
+                    
+                    # Roll 1-1000 for high-resolution rarity
+                    $roll = Get-Random -Minimum 1 -Maximum 1001 
 
-					$cumulative = 0
-					$resName = $null
-					foreach ($kvp in $planetData.Resources.GetEnumerator()) {
-						$cumulative += $kvp.Value
-						if ($roll -le $cumulative) {
-							$resName = $kvp.Key
-							break
-						}
-					}
-					# ----------------------------------
-					if ($Inventory.ContainsKey($resName)) {
-						$Inventory[$resName]++
-					}
-					else {
-						$Inventory[$resName] = 1
-					}
-					$sessionLog.Insert(0, @{
-						Text  = "+1 $resName"
-						Color = (Get-RarityColor $ResourceMaster[$resName].Rarity)
-					})
-					$Player.Fuel = [math]::Max(0, $Player.Fuel - 1)
-				}
-				else {
-					$player.Message = "Cargo hull is full!"
-					break
-				}
-			}
-			else {
-				break
-			}
-		}
+                    $cumulative = 0
+                    $resName = $null
+                    foreach ($kvp in $planetData.Resources.GetEnumerator()) {
+                        $cumulative += $kvp.Value
+                        if ($roll -le $cumulative) {
+                            $resName = $kvp.Key
+                            break
+                        }
+                    }
 
-		$maxDmg=[int]($planetData.Hazard / 2)
-		if ($maxDmg -lt 1) { $maxDmg = 1 }
-        if ((Get-Random -Min 1 -Max 100) -le ($planetData.Hazard / 4)) { # Damage roll O////||>>>>>>>>>
-            $dmg = Get-Random -Min 1 -Max $maxDmg
-            $Player.HP -= $dmg
+                    if ($resName) {
+                        if ($Inventory.ContainsKey($resName)) { $Inventory[$resName]++ }
+                        else { $Inventory[$resName] = 1 }
+                        
+                        $sessionLog.Insert(0, @{
+                            Text  = "+1 $resName"
+                            Color = (Get-RarityColor $ResourceMaster[$resName].Rarity)
+                        })
+                        $Player.Fuel = [math]::Max(0, $Player.Fuel - 1)
+                    }
+                }
+                else {
+                    $player.Message = "Cargo hull is full!"
+                    break
+                }
+            }
+            else { break }
+        }
+
+        # --- Balanced Hazard Logic ---
+        $frequencyModifier = 0.15
+        if ((Get-Random -Min 1 -Max 101) -le ($planetData.Hazard * $frequencyModifier)) {
+            
             $reason = if ($planetData.HazardReasons) { $planetData.HazardReasons | Get-Random } else { "Hull stress" }
-            $sessionLog.Insert(0, @{ Text = "-$dmg HP - $reason"; Color = "Red" })
+            $multiplier = if ($global:HazardMaster.ContainsKey($reason)) { $global:HazardMaster[$reason] } else { 1.0 }
 
-			# Trigger the visual flash, passing the UI drawing logic to keep it visible
-			# Now handles redrawing both during the flash and after the revert
-			Flash-DamageBackground -RedrawAction $DrawUI
+            $baseDmg = Get-Random -Min 3 -Max 10
+            $finalDmg = [int][math]::Max(1, ($baseDmg * $multiplier))
+            
+            $Player.HP -= $finalDmg
+            $sessionLog.Insert(0, @{ Text = "-$finalDmg HP - $reason"; Color = "Red" })
+
+            Flash-DamageBackground -RedrawAction $DrawUI
         }
 
         if ($Player.HP -le 0) { break }
@@ -652,6 +667,7 @@ function Show-BuyMenu {
     Initialize-Trader $planetName
     $trader = $global:TraderState[$planetName]
     while ($true) {
+		$Player.Message = "Buying from $($CurrentSolarSystem[$planetName].TraderName)"
         # Explicitly wrap in @() to fix "single item selection" bug
         $sortedStock = @($trader.Stock.Keys | ForEach-Object {
             $m = $ResourceMaster[$_]
@@ -739,6 +755,7 @@ function Show-SellMenu {
     Initialize-Trader $planetName
     $trader = $global:TraderState[$planetName]
     while ($true) {
+		$Player.Message = "Selling to $($CurrentSolarSystem[$planetName].TraderName)"
         # Explicitly wrap in @() to fix "single item selection" bug
         $sortedInv = @($Inventory.Keys | ForEach-Object {
             $m = $ResourceMaster[$_]
@@ -1033,11 +1050,11 @@ while ($true) {
 #endregion
 
 # CHANGELOG
-# 0.0.0 - 02/19/2026
-# 0.0.1 - Added a better death screen. Added damage backgroundcolor flashes. Revised Buy/Sell/Inv: No longer returns upon every selection, can now select final item, items now list their rarity and effects.Replaced Get-HPColor with Get-PercentColor for dynamic scaling. 
+# 0.0.0 - 02/15/2026
+# 0.0.1 - 02/19/2026 - Added a better death screen. Added damage backgroundcolor flashes. Revised Buy/Sell/Inv: No longer returns upon every selection, can now select final item, items now list their rarity and effects.Replaced Get-HPColor with Get-PercentColor for dynamic scaling. 
+# 0.0.2 - 02/20/2026 - Added $HazardMaster and re-worked the HazardReasons and Prospect damage logic. Added buying from/selling to headers. Changed resources from 100to1000 collective value, and re-balanced prospecting.
 
 # To add...
 # New factions arent listed on Solar Menu until found.
 # Quest mechanics (accepting/managing/completing) for unique rewards.
 # Require GasGiant and IceGiant prospecting drill upgrades before they can be prospected. 
-
