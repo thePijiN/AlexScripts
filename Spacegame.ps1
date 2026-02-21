@@ -152,7 +152,18 @@ function Start-NewGame {
 				InsufficientFunds="Transaction denied."; InsufficientFundsTrader="You've surpassed your credit-limit. Try again later."
 				Frustrated="What? No."
 			}
-			TraderStock = @{ "Fuel Cell (Small)" = 3; "Fuel Cell (Medium)" = 2; "U.C.E. Shield Generator MK I" = 1 }
+						TraderStock = @{ 
+				"Fuel Cell (Small)" = 3
+				"Fuel Cell (Medium)" = 2
+				"Fuel Cell (Large)" = 1
+				"Shield Cell (Small)" = 3
+				"Shield Cell (Medium)" = 2
+				"Shield Cell (Large)" = 1
+				"U.C.E. Shield Generator MK I" = 1
+				"U.C.E. Shield Generator MK II" = 1
+				"U.C.E. Shield Generator MK III" = 1
+				"Auxiliary Fuel Tank" = 1
+			}
 		}
 		Mars     = @{ 
 			Distance    = 1.5; Inhabited = $true;  Type = "Terrestrial"; Hazard = 25; PlanetColor="DarkRed"
@@ -166,7 +177,16 @@ function Start-NewGame {
 				InsufficientFunds="Credits first, hero."; InsufficientFundsTrader="And what'll ya be wanting for that?."
 				Frustrated="Come again, now?"
 			}
-			TraderStock = @{ "Fuel Cell (Small)" = 3; "Cargo Baffles" = 1 }
+			TraderStock = @{ 
+				"Fuel Cell (Small)" = 3
+				"Fuel Cell (Medium)" = 2
+				"Fuel Cell (Large)" = 1
+				"Shield Cell (Small)" = 3
+				"Shield Cell (Medium)" = 2
+				"Shield Cell (Large)" = 1
+				"Cargo Baffles" = 1
+				"Auxiliary Fuel Tank" = 1
+			}
 		}
 		# Ceres
 		Ceres    = @{ 
