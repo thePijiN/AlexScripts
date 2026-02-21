@@ -57,15 +57,16 @@ function Start-NewGame {
         "Biomass"          = @{ Value = 30;  Weight = 1; Rarity = "Rare";        Description = "Organic matter samples."; Consumable = $false }
 		# Rarities / Artifiacts
 		"MetallicHydrogen" = @{ Value = 250; Weight = 3; Rarity = "SuperRare";   Description = "Highly pressurized fuel precursor."; Consumable = $false }
+		
 		"Fossils"		   = @{ Value = 300; Weight = 1; Rarity = "SuperRare";  Description = "Unknown fossilzed alien lifeform."; Consumable = $false }
 
         # --- Consumables ---
-        "Fuel Cell (Small)" 	= @{ Value = 35;  Weight = 3; Rarity = "Consumable";  Consumable = $true; Effect = "Fuel"; EffectValue = 25 ; Description = "A small emergency fuel cell.";  UseMessage = "+25% Fuel administered" }
-		"Fuel Cell (Medium)"	= @{ Value = 75;  Weight = 4; Rarity = "Consumable";  Consumable = $true; Effect = "Fuel"; EffectValue = 50 ; Description = "A medium emergency fuel cell.";  UseMessage = "+50% Fuel administered" }
-		"Fuel Cell (Large)"		= @{ Value = 100; Weight = 5; Rarity = "Consumable";  Consumable = $true; Effect = "Fuel"; EffectValue = 75 ; Description = "A large emergency fuel cell.";  UseMessage = "+75% Fuel administered" }
-        "Shield Cell (Small)"   = @{ Value = 50;  Weight = 3; Rarity = "Consumable";  Consumable = $true; Effect = "HP"; EffectValue = 25 ; Description = "A small emergency shield restoration unit."; UseMessage = "+25% HP Restored" }
-		"Shield Cell (Medium)"  = @{ Value = 100; Weight = 4; Rarity = "Consumable";  Consumable = $true; Effect = "HP"; EffectValue = 50 ; Description = "A medium emergency shield restoration unit."; UseMessage = "+50% HP Restored" }
-        "Shield Cell (Large)"   = @{ Value = 150; Weight = 5; Rarity = "Consumable";  Consumable = $true; Effect = "HP"; EffectValue = 100 ; Description = "A large emergency shield restoration unit."; UseMessage = "+100% HP Restored" }
+        "Fuel Cell (Small)" 	= @{ Value = 25;  Weight = 1; Rarity = "Consumable";  Consumable = $true; Effect = "Fuel"; EffectValue = 25 ; Description = "A small emergency fuel cell.";  UseMessage = "+25% Fuel administered" }
+		"Fuel Cell (Medium)"	= @{ Value = 50;  Weight = 2; Rarity = "Consumable";  Consumable = $true; Effect = "Fuel"; EffectValue = 50 ; Description = "A medium emergency fuel cell.";  UseMessage = "+50% Fuel administered" }
+		"Fuel Cell (Large)"		= @{ Value = 75; Weight = 3; Rarity = "Consumable";  Consumable = $true; Effect = "Fuel"; EffectValue = 75 ; Description = "A large emergency fuel cell.";  UseMessage = "+75% Fuel administered" }
+        "Shield Cell (Small)"   = @{ Value = 50;  Weight = 1; Rarity = "Consumable";  Consumable = $true; Effect = "HP"; EffectValue = 25 ; Description = "A small emergency shield restoration unit."; UseMessage = "+25% HP Restored" }
+		"Shield Cell (Medium)"  = @{ Value = 100; Weight = 2; Rarity = "Consumable";  Consumable = $true; Effect = "HP"; EffectValue = 50 ; Description = "A medium emergency shield restoration unit."; UseMessage = "+50% HP Restored" }
+        "Shield Cell (Large)"   = @{ Value = 150; Weight = 3; Rarity = "Consumable";  Consumable = $true; Effect = "HP"; EffectValue = 100 ; Description = "A large emergency shield restoration unit."; UseMessage = "+100% HP Restored" }
 
         # --- Upgrades ---
 		# Stat Boosters
@@ -129,19 +130,19 @@ function Start-NewGame {
 		_Metadata = @{ Name = "The Sol System" }
 		# Terrestrial 
 		Mercury  = @{ 
-			Distance    = 0.4; Inhabited = $false; Type = "Terrestrial"; Hazard = 70; PlanetColor="DarkYellow"
+			Distance    = 0.4; Inhabited = $false; Type = "Terrestrial"; Hazard = 60; PlanetColor="DarkYellow"
 			Description = "Mostly magma."
-			Resources   = @{ "Iron" = 450; "Nickel" = 250; "Silicates" = 150; "Sulfur" = 100; "Gold" = 45; "Copper" = 5 }
+			Resources   = @{ "Iron" = 400; "Nickel" = 150; "Silicates" = 150; "Sulfur" = 100; "Gold" = 100; "Copper" = 100 }
 			HazardReasons = @("Solar flare radiation", "Magma spray", "Hull stress", "Micro-vibrations", "Tectonic shift", "Tectonic plate collapse")
 		}
 		Venus    = @{ 
-			Distance    = 0.7; Inhabited = $false; Type = "Terrestrial"; Hazard = 80; PlanetColor="Yellow"
+			Distance    = 0.7; Inhabited = $false; Type = "Terrestrial"; Hazard = 40; PlanetColor="Yellow"
 			Description = "Very bright."
-			Resources   = @{ "SulfuricAcid" = 550; "Nitrogen" = 200; "Sulfur" = 150; "Nickel" = 85; "Silver" = 12; "Gold" = 3 }
+			Resources   = @{ "SulfuricAcid" = 400; "Nitrogen" = 200; "Sulfur" = 100; "Nickel" = 10; "Silver" = 200; "Gold" = 60 }
 			HazardReasons = @("Acid rain corrosion", "Atmospheric turbulence", "Hull stress", "Static discharge", "Tectonic shift", "Tectonic plate collapse")
 		}
 		Earth    = @{ 
-			Distance    = 1.0; Inhabited = $true;  Type = "Terrestrial"; Hazard = 10; PlanetColor="Green"
+			Distance    = 1.0; Inhabited = $true;  Type = "Terrestrial"; Hazard = 20; PlanetColor="Green"
 			Description = "Home?"
 			Resources   = @{ "Water" = 400; "ScrapMetal" = 200; "Iron" = 113; "Copper" = 100; "Biomass" = 150; "Silver" = 20; "Uranium" = 10; "Gold"  = 5; "Fossils" = 2 }
 			HazardReasons = @("Atmospheric turbulence", "Hull stress", "Micro-vibrations", "Static discharge", "Tectonic shift")
@@ -166,9 +167,9 @@ function Start-NewGame {
 			}
 		}
 		Mars     = @{ 
-			Distance    = 1.5; Inhabited = $true;  Type = "Terrestrial"; Hazard = 25; PlanetColor="DarkRed"
+			Distance    = 1.5; Inhabited = $true;  Type = "Terrestrial"; Hazard = 10; PlanetColor="DarkRed"
 			Description = "The frontier."
-			Resources   = @{ "Iron" = 600; "Silicates" = 250; "ScrapMetal" = 100; "Water" = 40; "Silver" = 10 }
+			Resources   = @{ "Iron" = 500; "Silicates" = 300; "ScrapMetal" = 100; "Water" = 50; "Silver" = 50 }
 			HazardReasons = @("Dust storm abrasion", "Static discharge", "Hull stress", "Micro-vibrations", "Tectonic shift")
 			TraderName="Mars Colony"; TotalTraderCredits=3000; FuelModifier=1.0; RepairModifier=1.0
 			Dialog=@{
@@ -192,56 +193,56 @@ function Start-NewGame {
 		Ceres    = @{ 
 			Distance    = 2.8; Inhabited = $false; Type = "Asteroid";    Hazard = 35; PlanetColor="Gray"
 			Description = "An abandoned rock."
-			Resources   = @{ "Water" = 350; "Iron" = 350; "Silicates" = 200; "Nickel" = 80; "Silver" = 15; "Gold" = 5 }
+			Resources   = @{ "Water" = 250; "Iron" = 250; "Silicates" = 200; "Nickel" = 80; "Silver" = 120; "Gold" = 100 }
 			HazardReasons = @("Ring shard impact", "Micro-vibrations", "Hull stress", "Static discharge", "Asteroid impact")
 		}
 		# Jovian 
 		Jupiter  = @{ 
-			Distance    = 5.2; Inhabited = $false; Type = "Gas Giant";   Hazard = 95; PlanetColor="Red"
+			Distance    = 5.2; Inhabited = $false; Type = "Gas Giant";   Hazard = 80; PlanetColor="Red"
 			Description = "Vast and hostile."
-			Resources   = @{ "Hydrogen" = 700; "Helium" = 150; "MetallicHydrogen" = 120; "Nitrogen" = 30 }
+			Resources   = @{ "Hydrogen" = 500; "MetallicHydrogen" = 250; "Helium" = 200; "Nitrogen" = 50 }
 			HazardReasons = @("Gravity well shear", "Solar flare radiation", "Hull stress", "Atmospheric turbulence", "Super-cyclone vortex")
 		}
 		Saturn   = @{ 
-			Distance    = 9.5; Inhabited = $false; Type = "Gas Giant";   Hazard = 85; PlanetColor="Yellow"
+			Distance    = 9.5; Inhabited = $false; Type = "Gas Giant";   Hazard = 60; PlanetColor="Yellow"
 			Description = "The ringed behemoth."
-			Resources   = @{ "Hydrogen" = 650; "Water" = 200; "Helium" = 100; "ScrapMetal" = 40; "Silicates" = 10 }
+			Resources   = @{ "Hydrogen" = 500; "MetallicHydrogen" = 150; "Water" = 200; "Helium" = 100; "ScrapMetal" = 40; "Silicates" = 10 }
 			HazardReasons = @("Ring shard impact", "Lightning discharge", "Hull stress", "Static discharge", "Super-cyclone vortex")
 		}
 		Uranus   = @{ 
 			Distance    = 19.2; Inhabited = $false; Type = "Ice Giant";   Hazard = 50; PlanetColor="DarkCyan"
 			Description = "The tilted giant."
-			Resources   = @{ "Hydrogen" = 500; "Water" = 350; "Nitrogen" = 125; "Uranium" = 25 }
+			Resources   = @{ "Hydrogen" = 375; "MetallicHydrogen" = 125; "Water" = 300; "Nitrogen" = 100; "Uranium" = 100 }
 			HazardReasons = @("Extreme cold stress", "Methane pressure spike", "Hull stress", "Micro-vibrations")
 		}
 		Neptune  = @{ 
-			Distance    = 30.1; Inhabited = $false; Type = "Ice Giant";   Hazard = 55; PlanetColor="Blue"
+			Distance    = 30.1; Inhabited = $false; Type = "Ice Giant";   Hazard = 75; PlanetColor="Blue"
 			Description = "Deep blue."
-			Resources   = @{ "Hydrogen" = 600; "SulfuricAcid" = 250; "Nitrogen" = 125; "Water" = 25 }
+			Resources   = @{ "Hydrogen" = 450; "MetallicHydrogen" = 200; "SulfuricAcid" = 200; "Nitrogen" = 125; "Water" = 25 }
 			HazardReasons = @("Supersonic wind shear", "Extreme cold stress", "Hull stress", "Atmospheric turbulence")
 		}
 		Pluto    = @{ 
 			Distance    = 39.5; Inhabited = $false; Type = "Dwarf";       Hazard = 20; PlanetColor="White"
 			Description = "The icy underdog."
-			Resources   = @{ "Water" = 500; "Nitrogen" = 350; "Biomass" = 145; "Fossils" = 5 }
+			Resources   = @{ "Water" = 350; "Nitrogen" = 300; "Biomass" = 100; "Silver" = 100; "Gold" = 100; "Fossils" = 50 }
 			HazardReasons = @("Cryo-geyser eruption", "Extreme cold stress", "Hull stress", "Micro-vibrations", "Asteroid impact")
 		}
 		Haumea   = @{ 
 			Distance    = 43.2; Inhabited = $false; Type = "Dwarf";       Hazard = 15; PlanetColor="Gray"
 			Description = "Hi'iaka & Namaka"
-			Resources   = @{ "Silicates" = 750; "ScrapMetal" = 200; "Iron" = 50 }
+			Resources   = @{ "Silicates" = 500; "ScrapMetal" = 100; "Silver" = 100; "Gold" = 100; "Copper" = 100; "Iron" = 50; "Nickel" = 50 }
 			HazardReasons = @("Micro-vibrations", "Hull stress", "Static discharge", "Asteroid impact")
 		}
 		Makemake = @{ 
 			Distance    = 45.5; Inhabited = $false; Type = "Dwarf";       Hazard = 15; PlanetColor="Gray"
 			Description = "Red and cold."
-			Resources   = @{ "Nitrogen" = 650; "Hydrogen" = 200; "Water" = 140; "Silicates" = 10 }
+			Resources   = @{ "Nitrogen" = 350; "Hydrogen" = 200; "Water" = 140; "Iron" = 75; "Nickel" = 75; "Silver" = 50; "Gold" = 50; "Copper" = 50; "Silicates" = 10 }
 			HazardReasons = @("Extreme cold stress", "Hull stress", "Static discharge", "Asteroid impact")
 		}
 		Eris     = @{ 
 			Distance    = 67.8; Inhabited = $false; Type = "Dwarf";       Hazard = 40; PlanetColor="Gray"
 			Description = "Far-out..."
-			Resources   = @{ "MetallicHydrogen" = 450; "ScrapMetal" = 450; "Biomass" = 100 }
+			Resources   = @{ "MetallicHydrogen" = 450; "ScrapMetal" = 450; "Gold" = 50; "Silver" = 50 }
 			HazardReasons = @("Solar flare radiation", "Hull stress", "Micro-vibrations", "Asteroid impact")
 		}
 	}
@@ -426,8 +427,8 @@ function Prospect {
     while ($true) {
         &$DrawUI
 
-        # Resource Tick (Every 2 seconds)
-        if (((Get-Date) - $lastYieldTime).TotalSeconds -ge 2) {
+        # Resource Tick (Every second)
+        if (((Get-Date) - $lastYieldTime).TotalSeconds -ge 1) {
             $lastYieldTime = Get-Date
 
             if ($Player.Fuel -gt 0) {
@@ -468,7 +469,7 @@ function Prospect {
         }
 
         # --- Balanced Hazard Logic ---
-        $frequencyModifier = 0.15
+        $frequencyModifier = 0.35
         if ((Get-Random -Min 1 -Max 101) -le ($planetData.Hazard * $frequencyModifier)) {
             
             $reason = if ($planetData.HazardReasons) { $planetData.HazardReasons | Get-Random } else { "Hull stress" }
@@ -532,7 +533,7 @@ function Show-Header {
     
     # HP (High = Good)
     Write-Host -BackgroundColor Black -NoNewline " | HP="
-    $hpCol = Get-PercentColor -Current $Player.HP -Max 100
+    $hpCol = Get-PercentColor -Current $Player.HP -Max $player.MaxHP
     Write-Host -BackgroundColor Black -NoNewline "$($Player.HP)" -ForegroundColor $hpCol
 	Write-Host -BackgroundColor Black -NoNewline "/$($Player.MaxHP)"
     
@@ -1072,7 +1073,7 @@ while ($true) {
 # CHANGELOG
 # 0.0.0 - 02/15/2026
 # 0.0.1 - 02/19/2026 - Added a better death screen. Added damage backgroundcolor flashes. Revised Buy/Sell/Inv: No longer returns upon every selection, can now select final item, items now list their rarity and effects.Replaced Get-HPColor with Get-PercentColor for dynamic scaling. 
-# 0.0.2 - 02/20/2026 - Added $HazardMaster and re-worked the HazardReasons and Prospect damage logic. Added buying from/selling to headers. Changed resources from 100to1000 collective value, and re-balanced prospecting.
+# 0.0.2 - 02/20/2026 - Added $HazardMaster and re-worked the HazardReasons and Prospect damage logic. Added buying from/selling to headers. Changed resources from 100to1000 collective value, and re-balanced prospecting. Re-balanced
 
 # To add...
 # New factions arent listed on Solar Menu until found.
