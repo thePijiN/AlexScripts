@@ -7,11 +7,11 @@ function Start-NewGame {
 
 ##### PLAYER #####
     $global:Player = @{
-        Credits    = 500
+        Credits    = 000
         HP         = 100
 		MaxHP	   = 100
-        Fuel       = 300
-        MaxFuel    = 300
+        Fuel       = 100
+        MaxFuel    = 100
 		MaxWeight  = 100
 		System	   = $null
         Location   = "Mars"
@@ -37,24 +37,24 @@ function Start-NewGame {
 		# Debug 
 		"HeavyObject"      = @{ Value = 1000;Weight = 999; Rarity = "SuperRare"; Description = "Shit's heavy."; Consumable = $false }
         # Metals
-		"Iron"             = @{ Value = 10;  Weight = 1; Rarity = "SuperCommon"; Description = "Raw Iron ore."; Consumable = $false }
-		"ScrapMetal"       = @{ Value = 25;  Weight = 2; Rarity = "Common";      Description = "Salvaged hull plating."; Consumable = $false }
+		"Iron"             = @{ Value = 5;  Weight = 1; Rarity = "SuperCommon"; Description = "Raw Iron ore."; Consumable = $false }
+		"ScrapMetal"       = @{ Value = 20;  Weight = 2; Rarity = "Common";      Description = "Salvaged hull plating."; Consumable = $false }
 		"Copper"           = @{ Value = 30;  Weight = 1; Rarity = "Common";      Description = "Raw Copper ore."; Consumable = $false }
 		"Nickel"           = @{ Value = 40;  Weight = 1; Rarity = "Common"; 	 Description = "Raw Nickel ore."; Consumable = $false }
-		"Silver"           = @{ Value = 10;  Weight = 1; Rarity = "Rare"; 	 	 Description = "Raw Silver ore."; Consumable = $false }
+		"Silver"           = @{ Value = 100;  Weight = 1; Rarity = "Rare"; 	 	 Description = "Raw Silver ore."; Consumable = $false }
 		"Gold"			   = @{ Value = 250; Weight = 1; Rarity = "SuperRare"; 	 Description = "Raw Glistening Gold ore."; Consumable = $false }
 		"Uranium"          = @{ Value = 150;  Weight = 1; Rarity = "SuperRare";  Description = "Raw Uranium ore. (spicy!)"; Consumable = $false }
 		# Minerals 
-        "Silicates"        = @{ Value = 10;  Weight = 1; Rarity = "SuperCommon"; Description = "Raw silicate minerals."; Consumable = $false }
-        "Sulfur"           = @{ Value = 18;  Weight = 1; Rarity = "Common";      Description = "Crystalline sulfur."; Consumable = $false }
-        "SulfuricAcid"     = @{ Value = 25;  Weight = 2; Rarity = "Common";      Description = "Corrosive chemical drums."; Consumable = $false }
+        "Silicates"        = @{ Value = 5;  Weight = 1; Rarity = "SuperCommon"; Description = "Raw silicate minerals."; Consumable = $false }
+        "Sulfur"           = @{ Value = 20;  Weight = 1; Rarity = "Common";      Description = "Crystalline sulfur."; Consumable = $false }
+        "SulfuricAcid"     = @{ Value = 30;  Weight = 2; Rarity = "Common";      Description = "Corrosive chemical drums."; Consumable = $false }
 		# Gases
 		"Nitrogen"         = @{ Value = 12;  Weight = 1; Rarity = "Common";      Description = "Compressed nitrogen canisters."; Consumable = $false }
         "Hydrogen"         = @{ Value = 14;  Weight = 1; Rarity = "Common";      Description = "Hydrogen gas cylinders."; Consumable = $false }
-		"Helium"           = @{ Value = 30;  Weight = 1; Rarity = "Rare";      	 Description = "Helium gas cylinders."; Consumable = $false }
+		"Helium"           = @{ Value = 75;  Weight = 1; Rarity = "Rare";      	 Description = "Helium gas cylinders."; Consumable = $false }
 		# Biological materials
-        "Water"            = @{ Value = 10;  Weight = 1; Rarity = "SuperCommon"; Description = "Frozen H2O blocks."; Consumable = $false }
-        "Biomass"          = @{ Value = 30;  Weight = 1; Rarity = "Rare";        Description = "Organic matter samples."; Consumable = $false }
+        "Water"            = @{ Value = 5;  Weight = 1; Rarity = "SuperCommon"; Description = "Frozen H2O blocks."; Consumable = $false }
+        "Biomass"          = @{ Value = 35;  Weight = 1; Rarity = "Rare";        Description = "Organic matter samples."; Consumable = $false }
 		# Rarities / Artifiacts
 		"MetallicHydrogen" = @{ Value = 250; Weight = 3; Rarity = "SuperRare";   Description = "Highly pressurized fuel precursor."; Consumable = $false }
 		
@@ -71,7 +71,7 @@ function Start-NewGame {
         # --- Upgrades ---
 		# Stat Boosters
         "Cargo Baffles"    				= @{ Value = 500; Weight = 0; Rarity = "Upgrade";     Description = "Optimized storage racks."; Consumable = $true; Effect = "MaxWeight"; EffectValue = 25 }
-		"Auxiliary Fuel Tank"  			= @{ Value = 500; Weight = 0; Rarity = "Upgrade";     Description = "Additional fuel capacity."; Consumable = $true; Effect = "MaxFuel"; EffectValue = 100 }
+		"Auxiliary Fuel Tank"  			= @{ Value = 500; Weight = 0; Rarity = "Upgrade";     Description = "Additional fuel capacity."; Consumable = $true; Effect = "MaxFuel"; EffectValue = 200 }
 		"U.C.E. Shield Generator MK I"  = @{ Value = 250; Weight = 0; Rarity = "Upgrade";     Description = "Increased shield capacity."; Consumable = $true; Effect = "MaxHP"; EffectValue = 25 }
 		"U.C.E. Shield Generator MK II" = @{ Value = 500; Weight = 0; Rarity = "Upgrade";     Description = "Increased shield capacity."; Consumable = $true; Effect = "MaxHP"; EffectValue = 50 }
 		"U.C.E. Shield Generator MK III"= @{ Value = 750; Weight = 0; Rarity = "Upgrade";     Description = "Increased shield capacity."; Consumable = $true; Effect = "MaxHP"; EffectValue = 75 }
@@ -86,31 +86,31 @@ function Start-NewGame {
 	$global:HazardMaster = @{
 		# Universal / Low Severity
 		"Hull stress"                = 0.2
-		"Micro-vibrations"           = 0.5
-		"Static discharge"           = 0.8
-		"Atmospheric turbulence"     = 1.0
+		"Micro-vibrations"           = 0.4
+		"Static discharge"           = 0.6
+		"Atmospheric turbulence"     = 0.8
 
 		# Moderate Severity
-		"Tectonic shift"			 = 1.6
-		"Solar flare radiation"      = 1.5
-		"Acid rain corrosion"        = 1.8
-		"Dust storm abrasion"        = 1.4
-		"Extreme cold stress"        = 1.5
-		"Gravity well shear"         = 1.8
+		"Gravity well shear"         = 1.0
+		"Dust storm abrasion"        = 1.1
+		"Tectonic shift"			 = 1.2
+		"Solar flare radiation"      = 1.4
+		"Acid rain corrosion"        = 1.6
+		"Extreme cold stress"        = 1.8
 
 		# High Severity
-		"Ring shard impact"          = 3.0
+		"Methane pressure spike"     = 2.0
+		"Supersonic wind shear"      = 2.2
+		"Cryo-geyser eruption"       = 2.4
+		"Lightning discharge"        = 2.6
+		"Ring shard impact"          = 2.8
 		"Magma spray"                = 3.0
-		"Lightning discharge"        = 2.5
-		"Methane pressure spike"     = 2.5
-		"Cryo-geyser eruption"       = 2.2
-		"Supersonic wind shear"      = 2.0
 		
 		# Catastrophic Severity
-		"Extreme Lightning discharge"= 5
-		"Asteroid impact"			 = 4.5
-		"Super-cyclone vortex"       = 4.2
-		"Tectonic plate collapse"	 = 4
+		"Extreme Lightning discharge"= 4.0
+		"Asteroid impact"			 = 4.2
+		"Super-cyclone vortex"       = 4.4
+		"Tectonic plate collapse"	 = 4.6
 		
 		# Catacylysmic Severity
 		"Singularity"				 = 100
@@ -130,21 +130,21 @@ function Start-NewGame {
 		_Metadata = @{ Name = "The Sol System" }
 		# Terrestrial 
 		Mercury  = @{ 
-			Distance    = 0.4; Inhabited = $false; Type = "Terrestrial"; Hazard = 60; PlanetColor="DarkYellow"
+			Distance    = 0.4; Inhabited = $false; Type = "Terrestrial"; Hazard = 65; PlanetColor="DarkYellow"
 			Description = "Mostly magma."
 			Resources   = @{ "Iron" = 400; "Nickel" = 150; "Silicates" = 150; "Sulfur" = 100; "Gold" = 100; "Copper" = 100 }
 			HazardReasons = @("Solar flare radiation", "Magma spray", "Hull stress", "Micro-vibrations", "Tectonic shift", "Tectonic plate collapse")
 		}
 		Venus    = @{ 
-			Distance    = 0.7; Inhabited = $false; Type = "Terrestrial"; Hazard = 40; PlanetColor="Yellow"
+			Distance    = 0.7; Inhabited = $false; Type = "Terrestrial"; Hazard = 45; PlanetColor="Yellow"
 			Description = "Very bright."
 			Resources   = @{ "SulfuricAcid" = 400; "Nitrogen" = 200; "Sulfur" = 100; "Nickel" = 10; "Silver" = 200; "Gold" = 60 }
 			HazardReasons = @("Acid rain corrosion", "Atmospheric turbulence", "Hull stress", "Static discharge", "Tectonic shift", "Tectonic plate collapse")
 		}
 		Earth    = @{ 
-			Distance    = 1.0; Inhabited = $true;  Type = "Terrestrial"; Hazard = 20; PlanetColor="Green"
+			Distance    = 1.0; Inhabited = $true;  Type = "Terrestrial"; Hazard = 20; PlanetColor="DarkGreen"
 			Description = "Home?"
-			Resources   = @{ "Water" = 400; "ScrapMetal" = 200; "Iron" = 113; "Copper" = 100; "Biomass" = 150; "Silver" = 20; "Uranium" = 10; "Gold"  = 5; "Fossils" = 2 }
+			Resources   = @{ "Water" = 400; "ScrapMetal" = 200; "Iron" = 163; "Copper" = 100; "Biomass" = 100; "Silver" = 25; "Uranium" = 5; "Gold"  = 5; "Fossils" = 2 }
 			HazardReasons = @("Atmospheric turbulence", "Hull stress", "Micro-vibrations", "Static discharge", "Tectonic shift")
 			TraderName="U.C.E.O.C.S."; TotalTraderCredits=5000; FuelModifier=1.2; RepairModifier=2.0
 			Dialog=@{
@@ -191,7 +191,7 @@ function Start-NewGame {
 		}
 		# Ceres
 		Ceres    = @{ 
-			Distance    = 2.8; Inhabited = $false; Type = "Asteroid";    Hazard = 35; PlanetColor="Gray"
+			Distance    = 2.8; Inhabited = $false; Type = "Asteroid";    Hazard = 25; PlanetColor="Gray"
 			Description = "An abandoned rock."
 			Resources   = @{ "Water" = 250; "Iron" = 250; "Silicates" = 200; "Nickel" = 80; "Silver" = 120; "Gold" = 100 }
 			HazardReasons = @("Ring shard impact", "Micro-vibrations", "Hull stress", "Static discharge", "Asteroid impact")
@@ -267,10 +267,9 @@ function Initialize-Trader($planetName) {
     }
     else {
         $elapsed = (Get-Date) - $global:TraderState[$planetName].LastTrade
-        if ($elapsed.TotalMinutes -ge 10) {
+        if ($elapsed.TotalMinutes -ge 5) {
             $global:TraderState[$planetName].Stock     = $planet.TraderStock.Clone()
             $global:TraderState[$planetName].Credits   = $planet.TotalTraderCredits
-            $global:TraderState[$planetName].LastTrade = Get-Date
         }
     }
 }
@@ -469,13 +468,13 @@ function Prospect {
         }
 
         # --- Balanced Hazard Logic ---
-        $frequencyModifier = 0.35
+        $frequencyModifier = 0.5
         if ((Get-Random -Min 1 -Max 101) -le ($planetData.Hazard * $frequencyModifier)) {
             
             $reason = if ($planetData.HazardReasons) { $planetData.HazardReasons | Get-Random } else { "Hull stress" }
             $multiplier = if ($global:HazardMaster.ContainsKey($reason)) { $global:HazardMaster[$reason] } else { 1.0 }
 
-            $baseDmg = Get-Random -Min 3 -Max 10
+            $baseDmg = Get-Random -Min 2 -Max 8
             $finalDmg = [int][math]::Max(1, ($baseDmg * $multiplier))
             
             $Player.HP -= $finalDmg
@@ -644,40 +643,52 @@ function Show-Inventory {
 function Show-TraderMenu {
     $planetName = $Player.Location
     Initialize-Trader $planetName
+    $trader = $global:TraderState[$planetName]
+    $planetData = $CurrentSolarSystem[$planetName]
+
     while ($true) {
         Show-Header
         Write-Host -NoNewline "[1] " -ForegroundColor Cyan; Write-Host "Back" -ForegroundColor DarkGray
         Write-Host "[2] Buy" -ForegroundColor Cyan
         Write-Host "[3] Sell" -ForegroundColor Cyan
-        $planetData = $CurrentSolarSystem[$planetName]
+        
         $missingFuel = $Player.MaxFuel - $Player.Fuel
         $fuelPrice = [math]::Ceiling(($missingFuel * 0.5) * $planetData.FuelModifier)
         $missingHP = $Player.MaxHP - $Player.HP
         $repairPrice = [math]::Ceiling(($missingHP * 1.0) * $planetData.RepairModifier)
+        
         $fuelColor = if ($Player.Credits -ge $fuelPrice) { "Green" } else { "Red" }
         $repairColor = if ($Player.Credits -ge $repairPrice) { "Green" } else { "Red" }
-		Write-Host -NoNewline "[4] Repair - " -ForegroundColor Cyan; Write-Host -NoNewline "$repairPrice" -ForegroundColor $repairColor; Write-Host " CD" -ForegroundColor Cyan
-		Write-Host -NoNewline "[5] Refuel - " -ForegroundColor Cyan; Write-Host -NoNewline "$fuelPrice" -ForegroundColor $fuelColor; Write-Host " CD" -ForegroundColor Cyan
+        
+        Write-Host -NoNewline "[4] Repair - " -ForegroundColor Cyan; Write-Host -NoNewline "$repairPrice" -ForegroundColor $repairColor; Write-Host " CD" -ForegroundColor Cyan
+        Write-Host -NoNewline "[5] Refuel - " -ForegroundColor Cyan; Write-Host -NoNewline "$fuelPrice" -ForegroundColor $fuelColor; Write-Host " CD" -ForegroundColor Cyan
+        
         $choice = Read-Host ">"
         switch ($choice) {
             "1" { return }
             "2" { Show-BuyMenu }
             "3" { Show-SellMenu }
-			"4" {
-					if ($Player.HP -ge $Player.MaxHP) { $Player.Dialog=$planetData.Dialog.Frustrated } 
-                    else {
-						if ($Player.Credits -ge $repairPrice) {
-							$Player.Credits -= $repairPrice; $Player.HP = $Player.MaxHP; $Player.Dialog=$planetData.Dialog.Repair
-						} else { $Player.Dialog=$planetData.Dialog.InsufficientFunds }
-					}
+            "4" {
+                if ($Player.HP -ge $Player.MaxHP) { $Player.Dialog = $planetData.Dialog.Frustrated } 
+                else {
+                    if ($Player.Credits -ge $repairPrice) {
+                        $Player.Credits -= $repairPrice
+                        $trader.Credits += $repairPrice
+                        $Player.HP = $Player.MaxHP
+                        $Player.Dialog = $planetData.Dialog.Repair
+                    } else { $Player.Dialog = $planetData.Dialog.InsufficientFunds }
+                }
             }
-			"5" {
-					if ($Player.Fuel -ge $Player.MaxFuel) { $Player.Dialog=$planetData.Dialog.Frustrated } 
-                    else {
-						if ($Player.Credits -ge $fuelPrice) {
-							$Player.Credits -= $fuelPrice; $Player.Fuel = $Player.MaxFuel; $Player.Dialog=$planetData.Dialog.Refuel
-						} else { $Player.Dialog=$planetData.Dialog.InsufficientFunds }
-					}
+            "5" {
+                if ($Player.Fuel -ge $Player.MaxFuel) { $Player.Dialog = $planetData.Dialog.Frustrated } 
+                else {
+                    if ($Player.Credits -ge $fuelPrice) {
+                        $Player.Credits -= $fuelPrice
+                        $trader.Credits += $fuelPrice
+                        $Player.Fuel = $Player.MaxFuel
+                        $Player.Dialog = $planetData.Dialog.Refuel
+                    } else { $Player.Dialog = $planetData.Dialog.InsufficientFunds }
+                }
             }
         }
     }
@@ -759,6 +770,8 @@ function Show-BuyMenu {
                 $totalCost = $m.Value * $qty
                 if ($Player.Credits -lt $totalCost) { $Player.Dialog = $CurrentSolarSystem[$planetName].Dialog.InsufficientFunds; continue }
                 
+				$global:TraderState[$planetName].LastTrade = Get-Date # Last Trade marker for Trader Restock 
+				
                 $Player.Credits -= $totalCost
                 $trader.Credits += $totalCost
                 if ($trader.Stock[$selectedName] -le $qty) { $trader.Stock.Remove($selectedName) }
@@ -835,6 +848,7 @@ function Show-SellMenu {
                 $selectedName = $sortedInv[$index].Name
                 $m = $ResourceMaster[$selectedName]
                 $playerQty = $Inventory[$selectedName]
+                $sellValue = [math]::Floor($m.Value * 0.69)
                 
                 $qty = 1
                 if ($playerQty -gt 1) {
@@ -842,19 +856,32 @@ function Show-SellMenu {
                     Write-Host -NoNewline "$selectedName" -ForegroundColor (Get-RarityColor $m.Rarity)
                     Write-Host " (A for all)?"
                     $qtyInput = Read-Host ">"
-                    if ($qtyInput -match "^[aA]$") { $qty = $playerQty }
+                    if ($qtyInput -match "^[aA]$") { 
+                        # Calculate how many the trader can actually afford
+                        $affordableQty = [math]::Floor($trader.Credits / $sellValue)
+                        $qty = [math]::Min($playerQty, $affordableQty)
+                        
+                        if ($qty -eq 0) {
+                            $Player.Message = "Trader cannot afford even one of these!"
+                            continue
+                        }
+                        if ($qty -lt $playerQty) {
+                            $Player.Message = "Trader could only afford $qty units."
+                        }
+                    }
                     elseif ($qtyInput -as [int]) { $qty = [int]$qtyInput }
                     else { continue }
                 }
 
                 if ($qty -le 0 -or $qty -gt $playerQty) { continue }
-                $sellValue = [math]::Floor($m.Value * 0.69)
                 $total = $sellValue * $qty
                 if ($trader.Credits -lt $total) { 
                     $Player.Dialog = $CurrentSolarSystem[$planetName].Dialog.InsufficientFundsTrader
                     continue 
                 }
                 
+				#$global:TraderState[$planetName].LastTrade = Get-Date # Last Trade marker for Trader Restock
+				
                 $Player.Credits += $total
                 $trader.Credits -= $total
                 if (-not $trader.Stock.ContainsKey($selectedName)) { $trader.Stock[$selectedName] = 0 }
@@ -1073,7 +1100,7 @@ while ($true) {
 # CHANGELOG
 # 0.0.0 - 02/15/2026
 # 0.0.1 - 02/19/2026 - Added a better death screen. Added damage backgroundcolor flashes. Revised Buy/Sell/Inv: No longer returns upon every selection, can now select final item, items now list their rarity and effects.Replaced Get-HPColor with Get-PercentColor for dynamic scaling. 
-# 0.0.2 - 02/20/2026 - Added $HazardMaster and re-worked the HazardReasons and Prospect damage logic. Added buying from/selling to headers. Changed resources from 100to1000 collective value, and re-balanced prospecting. Re-balanced
+# 0.0.2 - 02/20/2026 - Added $HazardMaster and re-worked the HazardReasons and Prospect damage logic. Added buying from/selling to headers. Changed resources from 100to1000 collective value, and re-balanced prospecting. Trader restock time halved to 5min. Re-balanced
 
 # To add...
 # New factions arent listed on Solar Menu until found.
